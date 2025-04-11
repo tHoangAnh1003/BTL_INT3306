@@ -1,0 +1,83 @@
+.qairline-footer {
+  width: 100%;
+
+
+  .footer-top {
+    background-color: #eeeeee;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .footer-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .footer-top-links {
+      list-style: none;
+      padding-left: 0;
+
+      li {
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .footer-bottom {
+    background-color: #f8f8f8;
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap; /* Để khi màn nhỏ thì xuống dòng */
+
+    .footer-left {
+      flex: 1; /* chiếm 1 phần */
+      min-width: 200px;
+      margin-bottom: 1rem;
+
+      .site-name {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      .social-icons {
+        display: flex;
+        gap: 1rem;
+
+        a {
+          color: #333;
+          font-size: 1.2rem;
+          transition: color 0.2s;
+
+          &:hover {
+            color: #777;
+          }
+        }
+      }
+    }
+
+    .footer-columns {
+      flex: 2; /* chiếm nhiều chỗ hơn */
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 2rem; /* khoảng cách giữa cột */
+
+      .footer-column {
+        min-width: 120px;
+
+        h4 {
+          font-size: 1.1rem;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          margin: 0.5rem 0;
+        }
+      }
+    }
+  }
+}

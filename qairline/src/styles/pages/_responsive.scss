@@ -1,0 +1,26 @@
+$DESKTOP : "DESKTOP";
+$TABLET : "TABLET";
+$MOBILE : "MOBILE";
+$BREAKPOINTS : (
+  $DESKTOP: 1200px,
+  $TABLET: 768px,
+  $MOBILE: 576px
+);
+
+@mixin Responsive($canvas) {
+  @if $canvas == $DESKTOP {
+    @media (min-width: map-get($BREAKPOINTS, $DESKTOP)) {
+      @content;
+    }
+  } @else if $canvas == $TABLET {
+    @media (min-width: map-get($BREAKPOINTS, $TABLET)) and (max-width: map-get($BREAKPOINTS, $DESKTOP)) {
+      @content;
+    }
+  } @else if $canvas == $MOBILE {
+    @media (max-width: map-get($BREAKPOINTS, $TABLET)) {
+      @content;
+    }
+  } @else {
+    @warn "Invalid canvas type: #{$canvas}. Use one of the following: #{$DESKTOP}, #{$TABLET}, #{$MOBILE}.";
+  }
+}

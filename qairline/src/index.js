@@ -1,5 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
+import { BrowserRouter } from 'react-router-dom';
+import RouterCustom from './router';
+import "./styles/styles.scss";
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<h1>QAirline</h1>);
+root.render(
+  <BrowserRouter>
+    <RouterCustom />
+  </BrowserRouter>
+);
