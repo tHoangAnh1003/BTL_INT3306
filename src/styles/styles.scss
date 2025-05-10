@@ -1,0 +1,25 @@
+@import "pages/all";
+@import "pages/responsive";
+
+
+.news-slide-item {
+  text-align: center;
+  padding: 0.5rem;
+  
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-weight: 500;
+  }
+  :hover {
+    background-color: #e0f7fa;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  
+}
