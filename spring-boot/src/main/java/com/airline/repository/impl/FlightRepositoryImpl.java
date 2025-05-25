@@ -24,70 +24,77 @@ public class FlightRepositoryImpl implements FlightRepository {
 	        this.airportRepository = new AirportRepositoryImpl(connection);
 	    }
 
-    @Override
-    public List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate) {
-        List<FlightEntity> flights = new ArrayList<>();
-        
-        Long departureAirportId = null;
-        Long arrivalAirportId = null;
-        
-        if (departureAirportName != null && !departureAirportName.isEmpty()) {
-            departureAirportId = airportRepository.findAirportIdByName(departureAirportName);
-            if (departureAirportId == null) {
-                return flights;  
-            }
-        }
-        
-        if (arrivalAirportName != null && !arrivalAirportName.isEmpty()) {
-            arrivalAirportId = airportRepository.findAirportIdByName(arrivalAirportName);
-            if (arrivalAirportId == null) {
-                return flights; 
-            }
-        }
-        
-        StringBuilder sql = new StringBuilder("SELECT * FROM flights WHERE 1=1");
-        List<Object> params = new ArrayList<>();
+	    @Override
+	    public List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate, Long flightId, String status) {
+	    	List<FlightEntity> flights = new ArrayList<>();
+	
+	        Long departureAirportId = null;
+	        Long arrivalAirportId = null;
+	
+	        if (departureAirportName != null && !departureAirportName.isEmpty()) {
+	            departureAirportId = airportRepository.findAirportIdByName(departureAirportName);
+	            if (departureAirportId == null) {
+	                return flights;  
+	            }
+	        }
+	
+	        if (arrivalAirportName != null && !arrivalAirportName.isEmpty()) {
+	            arrivalAirportId = airportRepository.findAirportIdByName(arrivalAirportName);
+	            if (arrivalAirportId == null) {
+	                return flights; 
+	            }
+	        }
+	
+	        StringBuilder sql = new StringBuilder("SELECT * FROM flights WHERE 1=1");
+	        List<Object> params = new ArrayList<>();
+	
+	        if (departureAirportId != null) {
+	            sql.append(" AND departure_airport = ?");
+	            params.add(departureAirportId);
+	        }
+	        if (arrivalAirportId != null) {
+	            sql.append(" AND arrival_airport = ?");
+	            params.add(arrivalAirportId);
+	        }
+	        if (departureDate != null) {
+	            sql.append(" AND DATE(departure_time) = ?");
+	            params.add(Date.valueOf(departureDate));
+	        }
+	        if (flightId != null) {
+	            sql.append(" AND flight_id = ?");
+	            params.add(flightId);
+	        }
+	        if (status != null && !status.isEmpty()) {
+	            sql.append(" AND status = ?");
+	            params.add(status);
+	        }
 
-        if (departureAirportId != null) {
-            sql.append(" AND departure_airport = ?");
-            params.add(departureAirportId);
-        }
-        if (arrivalAirportId != null) {
-            sql.append(" AND arrival_airport = ?");
-            params.add(arrivalAirportId);
-        }
-        if (departureDate != null) {
-            sql.append(" AND DATE(departure_time) = ?");
-            params.add(Date.valueOf(departureDate));
-        }
-        
-        try (Connection conn = ConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-            
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                FlightEntity flight = new FlightEntity();
-                flight.setFlightId(rs.getLong("flight_id"));
-                flight.setAirlineId(rs.getLong("airline_id"));
-                flight.setFlightNumber(rs.getString("flight_number"));
-                flight.setDepartureAirport(rs.getLong("departure_airport"));
-                flight.setArrivalAirport(rs.getLong("arrival_airport"));
-                flight.setDepartureTime(rs.getTimestamp("departure_time").toLocalDateTime());
-                flight.setArrivalTime(rs.getTimestamp("arrival_time").toLocalDateTime());
-                flight.setStatus(rs.getString("status"));
-                flights.add(flight);
-            }
+        	try (Connection conn = ConnectionUtil.getConnection();
+        		PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+	            for (int i = 0; i < params.size(); i++) {
+	                ps.setObject(i + 1, params.get(i));
+	            }
+	
+	            ResultSet rs = ps.executeQuery();
+	            while (rs.next()) {
+	                FlightEntity flight = new FlightEntity();
+	                flight.setFlightId(rs.getLong("flight_id"));
+	                flight.setAirlineId(rs.getLong("airline_id"));
+	                flight.setFlightNumber(rs.getString("flight_number"));
+	                flight.setDepartureAirport(rs.getLong("departure_airport"));
+	                flight.setArrivalAirport(rs.getLong("arrival_airport"));
+	                flight.setDepartureTime(rs.getTimestamp("departure_time").toLocalDateTime());
+	                flight.setArrivalTime(rs.getTimestamp("arrival_time").toLocalDateTime());
+	                flight.setStatus(rs.getString("status"));
+	                flights.add(flight);
+	            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
         return flights;
     }
-
 
     
     @Override

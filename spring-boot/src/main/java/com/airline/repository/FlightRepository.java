@@ -11,5 +11,5 @@ public interface FlightRepository {
     void save(FlightEntity flight);
     void update(FlightEntity flight);
     void delete(Long id);
-    List<FlightEntity> searchFlights(String departureAirport, String arrivalAirport, LocalDate departureDate);
+    List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate, Long flightId, String status);
 }

@@ -53,8 +53,10 @@ public class FlightAPI {
     public List<FlightEntity> searchFlights(
             @RequestParam String departure,
             @RequestParam String arrival,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
+            @RequestParam(required = false) Long flightId,
+            @RequestParam(required = false) String status) {
 
-        return flightService.searchFlights(departure, arrival, departureDate);
+        return flightService.searchFlights(departure, arrival, departureDate, flightId, status);
     }
 }

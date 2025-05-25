@@ -11,5 +11,5 @@ public interface FlightService {
     void createFlight(FlightEntity flight);
     void updateFlight(FlightEntity flight);
     void deleteFlight(Long id);
-    List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate);
+    List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate, Long flightId, String status);
 }

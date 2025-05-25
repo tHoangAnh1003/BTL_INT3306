@@ -53,10 +53,10 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
-    public List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate) {
+    public List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate, Long flightId, String status) {
         try (Connection connection = dataSource.getConnection()) {
             FlightRepository flightRepository = new FlightRepositoryImpl(connection);
-            return flightRepository.searchFlights(departureAirportName, arrivalAirportName, departureDate);
+            return flightRepository.searchFlights(departureAirportName, arrivalAirportName, departureDate, flightId, status);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Database error", e);
