@@ -5,7 +5,11 @@ import MasterLayout from "./pages/theme/masterLayout/masterLayout";
 import MasterAdLayout from "./pages/theme/masterAdLayout/masterAdLayout";
 import LoginPage from "./pages/admin/loginPage/loginPage";
 import SignupPage from "./pages/admin/signupPage/signupPage";
-
+import BookingPage from "./pages/users/Booking/booking";
+import ManageBookingPage from "./pages/users/ManageBookingPage/manageBooking";
+import CheckInPage from "./pages/users/CheckinPage/checkIn";
+import FlightInfoPage from "./pages/users/FlighInfomation/flightInfo";
+import PostPage from "./pages/admin/postPage/postPage";
 
 const renderUserRouter = () => {
   const userRouters = [
@@ -13,18 +17,22 @@ const renderUserRouter = () => {
       path: ROUTERS.USER.HOME,
       component: <HomePage />
     },
-    // {
-    //   path: ROUTERS.USER.BOOKING,
-    //   component: <BookingPage />
-    // },
-    // {
-    //   path: ROUTERS.USER.MANAGE,
-    //   component: <ManageBookingPage />
-    // },
-    // {
-    //   path: ROUTERS.USER.CHECK_IN,
-    //   component: <CheckInPage />
-    // }
+    {
+      path: ROUTERS.USER.BOOKING,
+      component: <BookingPage />
+    },
+    {
+      path: ROUTERS.USER.MANAGE,
+      component: <ManageBookingPage />
+    },
+    {
+      path: ROUTERS.USER.CHECK_IN,
+      component: <CheckInPage />
+    },
+    {
+      path: ROUTERS.USER.INFO,
+      component: <FlightInfoPage />
+    }
   ];
   return (
     <MasterLayout>
@@ -48,6 +56,10 @@ const renderAdminRouter = () => {
     {
       path: ROUTERS.ADMIN.REGISTER,
       component: <SignupPage />
+    },
+    {
+      path: ROUTERS.ADMIN.POST,
+      component: <PostPage />
     }
   ];
   return (

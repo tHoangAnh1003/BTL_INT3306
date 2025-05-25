@@ -100,6 +100,19 @@
           }
         }
       }
+
+      .qairline-nav-link {
+        background: none;
+        padding: 5px 5px;
+        color: #ddd;
+        border: 0;
+        font: inherit;
+
+        &:hover {
+          cursor: pointer;
+          color: #f0c14b;
+        }
+      }
     }
   }
 
@@ -253,7 +266,7 @@
     visibility: hidden;
     opacity: 0; // Thêm thuộc tính opacity
     transition: visibility 0.6s, opacity 0.6s; // Thêm hiệu ứng chuyển đổi
-  
+
     &.active {
       visibility: visible !important; // Hiển thị overlay
       opacity: 1; // Làm mờ nền

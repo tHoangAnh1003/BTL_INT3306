@@ -6,9 +6,27 @@ import airlineLogo from "../../../assets/imgs/logo-removebg-preview.png"; // Imp
 import "./header.scss"; // Import CSS file for styling
 
 import { ROUTERS } from "../../../utils/router-config";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
+
+  const navigate = useNavigate();
+
+  /** điều hướng + cuộn */
+  const handleNavClick = ({ path, sectionId }) => {
+    setIsMenuOpen(false);              // đóng burger menu
+    navigate(`/${path}`);              // điều hướng
+    const tryScroll = () => {
+      const el = sectionId && document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        requestAnimationFrame(tryScroll); // chờ phần tử mount
+      }
+    };
+    requestAnimationFrame(tryScroll);
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State để quản lý menu
 
   const toggleMenu = () => {
@@ -71,18 +89,19 @@ const Header = () => {
         </div>
 
         <ul className="qairline-nav-menu">
-          {menus?.map((menu, index) => (
-            <li key={index}>
-              <Link to={menu.path} className="qairline-nav-link">
-                {menu.name}
-              </Link>
+          {menus.map((m, i) => (
+            <li key={i}>
+              <button
+                className="qairline-nav-link"
+                onClick={() => handleNavClick(m)}
+              >
+                {m.name}
+              </button>
             </li>
           ))}
           <li>
             <button className="complaint-button">Khiếu nại</button>
-            <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
-              Đăng nhập
-            </Link>
+            <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">Đăng nhập</Link>
           </li>
         </ul>
       </nav>
