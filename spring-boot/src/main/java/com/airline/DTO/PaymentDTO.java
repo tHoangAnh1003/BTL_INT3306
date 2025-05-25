@@ -1,49 +1,31 @@
 package com.airline.DTO;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 public class PaymentDTO {
-    private Long paymentId;
+    private Long id;
     private Long bookingId;
-    private Double amount;
+    private BigDecimal amount;
+    private LocalDateTime paymentDate;
     private String paymentMethod;
     private String status;
 
-    public PaymentDTO(Long paymentId, Long bookingId, Double amount, String paymentMethod, String status) {
-        this.paymentId = paymentId;
-        this.bookingId = bookingId;
-        this.amount = amount;
-        this.paymentMethod = paymentMethod;
-        this.status = status;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getPaymentId() {
-        return paymentId;
-    }
+    public Long getBookingId() { return bookingId; }
+    public void setBookingId(Long bookingId) { this.bookingId = bookingId; }
 
-    public Long getBookingId() {
-        return bookingId;
-    }
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
 
-    public Double getAmount() {
-        return amount;
-    }
+    public LocalDateTime getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(LocalDateTime paymentDate) { this.paymentDate = paymentDate; }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
-    public String getStatus() {
-        return status;
-    }
-
-    @Override
-    public String toString() {
-        return "PaymentDTO{" +
-               "paymentId=" + paymentId +
-               ", bookingId=" + bookingId +
-               ", amount=" + amount +
-               ", paymentMethod='" + paymentMethod + '\'' +
-               ", status='" + status + '\'' +
-               '}';
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
-

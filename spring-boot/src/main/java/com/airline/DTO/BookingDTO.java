@@ -1,48 +1,30 @@
 package com.airline.DTO;
 
+import java.time.LocalDateTime;
+
 public class BookingDTO {
-    private Long bookingId;
+    private Long id;
     private Long passengerId;
     private Long flightId;
     private Long seatId;
+    private LocalDateTime bookingDate;
     private String status;
 
-    public BookingDTO(Long bookingId, Long passengerId, Long flightId, Long seatId, String status) {
-        this.bookingId = bookingId;
-        this.passengerId = passengerId;
-        this.flightId = flightId;
-        this.seatId = seatId;
-        this.status = status;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getBookingId() {
-        return bookingId;
-    }
+    public Long getPassengerId() { return passengerId; }
+    public void setPassengerId(Long passengerId) { this.passengerId = passengerId; }
 
-    public Long getPassengerId() {
-        return passengerId;
-    }
+    public Long getFlightId() { return flightId; }
+    public void setFlightId(Long flightId) { this.flightId = flightId; }
 
-    public Long getFlightId() {
-        return flightId;
-    }
+    public Long getSeatId() { return seatId; }
+    public void setSeatId(Long seatId) { this.seatId = seatId; }
 
-    public Long getSeatId() {
-        return seatId;
-    }
+    public LocalDateTime getBookingDate() { return bookingDate; }
+    public void setBookingDate(LocalDateTime bookingDate) { this.bookingDate = bookingDate; }
 
-    public String getStatus() {
-        return status;
-    }
-
-    @Override
-    public String toString() {
-        return "BookingDTO{" +
-               "bookingId=" + bookingId +
-               ", passengerId=" + passengerId +
-               ", flightId=" + flightId +
-               ", seatId=" + seatId +
-               ", status='" + status + '\'' +
-               '}';
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
