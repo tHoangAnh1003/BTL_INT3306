@@ -1,7 +1,8 @@
 package com.airline.repository;
 
-import java.util.List;
 import com.airline.repository.entity.FlightEntity;
+
+import java.util.List;
 
 public interface FlightRepository {
     List<FlightEntity> findAll();

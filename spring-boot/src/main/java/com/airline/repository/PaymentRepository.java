@@ -1,13 +1,13 @@
 package com.airline.repository;
 
-import java.util.List;
 import com.airline.repository.entity.PaymentEntity;
 
+import java.util.List;
+
 public interface PaymentRepository {
-    void addPayment(PaymentEntity payment);
-    PaymentEntity getPaymentById(Long id);
-    List<PaymentEntity> getAllPayments();
-    void updatePayment(PaymentEntity payment);
-    void deletePayment(Long id);
-    List<PaymentEntity> getPaymentsByBookingId(Long bookingId);
+    List<PaymentEntity> findAll();
+    PaymentEntity findById(Long id);
+    void save(PaymentEntity payment);
+    void update(PaymentEntity payment);
+    void delete(Long id);
 }
