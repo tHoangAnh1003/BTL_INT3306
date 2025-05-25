@@ -1,7 +1,7 @@
 package com.airline.repository.impl;
 
 import com.airline.repository.CustomerRepository;
-import com.airline.repository.entity.CustomerEntity;
+import com.airline.repository.entity.PassengerEntity;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public List<CustomerEntity> findAll() {
-        List<CustomerEntity> customers = new ArrayList<>();
+    public List<PassengerEntity> findAll() {
+        List<PassengerEntity> customers = new ArrayList<>();
         String sql = "SELECT passenger_id, full_name, email, phone, passport_number FROM passengers";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
@@ -35,7 +35,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public CustomerEntity findById(Long id) {
+    public PassengerEntity findById(Long id) {
         String sql = "SELECT passenger_id, full_name, email, phone, passport_number FROM passengers WHERE passenger_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, id);
@@ -51,7 +51,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public void save(CustomerEntity customer) {
+    public void save(PassengerEntity customer) {
         String sql = "INSERT INTO passengers (full_name, email, phone, passport_number) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, customer.getFullName());
@@ -78,7 +78,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public void update(CustomerEntity customer) {
+    public void update(PassengerEntity customer) {
         String sql = "UPDATE passengers SET full_name = ?, email = ?, phone = ?, passport_number = ? WHERE passenger_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, customer.getFullName());
@@ -105,7 +105,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public CustomerEntity findByEmail(String email) {
+    public PassengerEntity findByEmail(String email) {
         String sql = "SELECT passenger_id, full_name, email, phone, passport_number FROM passengers WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, email);
@@ -120,8 +120,8 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         return null;
     }
 
-    private CustomerEntity mapRowToCustomer(ResultSet rs) throws SQLException {
-        CustomerEntity customer = new CustomerEntity();
+    private PassengerEntity mapRowToCustomer(ResultSet rs) throws SQLException {
+        PassengerEntity customer = new PassengerEntity();
         customer.setPassengerId(rs.getLong("passenger_id"));
         customer.setFullName(rs.getString("full_name"));
         customer.setEmail(rs.getString("email"));

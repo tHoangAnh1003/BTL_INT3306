@@ -1,13 +1,13 @@
 package com.airline.repository;
 
 import java.util.List;
-import com.airline.repository.entity.CustomerEntity;
+import com.airline.repository.entity.PassengerEntity;
 
 public interface CustomerRepository {
-    List<CustomerEntity> findAll();
-    CustomerEntity findById(Long id);
-    void save(CustomerEntity customer);
-    void update(CustomerEntity customer);
+    List<PassengerEntity> findAll();
+    PassengerEntity findById(Long id);
+    void save(PassengerEntity customer);
+    void update(PassengerEntity customer);
     void delete(Long id);
-    CustomerEntity findByEmail(String email);
+    PassengerEntity findByEmail(String email);
 }

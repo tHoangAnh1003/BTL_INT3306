@@ -1,7 +1,5 @@
 package com.airline.builder;
 
-import com.airline.DTO.PassengerDTO;
-
 public class PassengerBuilder {
     private Long passengerId;
     private String fullName;
@@ -9,33 +7,59 @@ public class PassengerBuilder {
     private String phone;
     private String passportNumber;
 
-    public PassengerBuilder setPassengerId(Long passengerId) {
-        this.passengerId = passengerId;
-        return this;
+    private PassengerBuilder(Builder builder) {
+        this.passengerId = builder.passengerId;
+        this.fullName = builder.fullName;
+        this.email = builder.email;
+        this.phone = builder.phone;
+        this.passportNumber = builder.passportNumber;
     }
 
-    public PassengerBuilder setFullName(String fullName) {
-        this.fullName = fullName;
-        return this;
+    public static class Builder {
+        private Long passengerId;
+        private String fullName;
+        private String email;
+        private String phone;
+        private String passportNumber;
+
+        public Builder setPassengerId(Long passengerId) {
+            this.passengerId = passengerId;
+            return this;
+        }
+        public Builder setFullName(String fullName) {
+            this.fullName = fullName;
+            return this;
+        }
+        public Builder setEmail(String email) {
+            this.email = email;
+            return this;
+        }
+        public Builder setPhone(String phone) {
+            this.phone = phone;
+            return this;
+        }
+        public Builder setPassportNumber(String passportNumber) {
+            this.passportNumber = passportNumber;
+            return this;
+        }
+        public PassengerBuilder build() {
+            return new PassengerBuilder(this);
+        }
     }
 
-    public PassengerBuilder setEmail(String email) {
-        this.email = email;
-        return this;
+    public Long getPassengerId() {
+        return passengerId;
     }
-
-    public PassengerBuilder setPhone(String phone) {
-        this.phone = phone;
-        return this;
+    public String getFullName() {
+        return fullName;
     }
-
-    public PassengerBuilder setPassportNumber(String passportNumber) {
-        this.passportNumber = passportNumber;
-        return this;
+    public String getEmail() {
+        return email;
     }
-
-    public PassengerDTO build() {
-        return new PassengerDTO(passengerId, fullName, email, phone, passportNumber);
+    public String getPhone() {
+        return phone;
+    }
+    public String getPassportNumber() {
+        return passportNumber;
     }
 }
-

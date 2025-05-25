@@ -1,18 +1,18 @@
 package com.airline.repository.entity;
 
-public class CustomerEntity {
-    private Long passengerId;      
+public class PassengerEntity {
+    private Long id;      
     private String fullName;
     private String email;
     private String phone;
     private String passportNumber;
 
     public Long getPassengerId() {
-        return passengerId;
+        return id;
     }
 
     public void setPassengerId(Long passengerId) {
-        this.passengerId = passengerId;
+        this.id = passengerId;
     }
 
     public String getFullName() {
