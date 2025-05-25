@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class FlightRepositoryImpl implements FlightRepository {
 
     private final Connection connection;

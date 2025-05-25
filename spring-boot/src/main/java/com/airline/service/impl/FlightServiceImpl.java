@@ -6,9 +6,14 @@ import com.airline.service.FlightService;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
 public class FlightServiceImpl implements FlightService {
 
-    private final FlightRepository flightRepository;
+	@Autowired
+    private FlightRepository flightRepository;
 
     public FlightServiceImpl(FlightRepository flightRepository) {
         this.flightRepository = flightRepository;

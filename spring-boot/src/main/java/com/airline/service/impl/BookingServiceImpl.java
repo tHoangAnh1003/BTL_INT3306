@@ -2,6 +2,7 @@ package com.airline.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.airline.repository.BookingRepository;
@@ -11,7 +12,8 @@ import com.airline.service.BookingService;
 @Service
 public class BookingServiceImpl implements BookingService {
 
-    private final BookingRepository bookingRepository;
+	@Autowired
+    private BookingRepository bookingRepository;
 
     public BookingServiceImpl(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;

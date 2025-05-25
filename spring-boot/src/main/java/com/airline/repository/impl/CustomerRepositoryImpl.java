@@ -7,6 +7,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class CustomerRepositoryImpl implements CustomerRepository {
 
     private final Connection connection;
