@@ -1,6 +1,6 @@
 package com.airline.DTO;
 
-public class CustomerDTO {
+public class PassengerDTO {
     private Long id;
     private String fullName;
     private String email;
