@@ -133,7 +133,7 @@ public class FlightRepositoryImpl implements FlightRepository {
         String sql = "INSERT INTO flights (airline_id, flight_number, departure_airport, arrival_airport, departure_time, arrival_time, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setLong(1, flight.getAirlineId());
+        	pstmt.setLong(1, flight.getAirlineId());
             pstmt.setString(2, flight.getFlightNumber());
             pstmt.setLong(3, flight.getDepartureAirport());
             pstmt.setLong(4, flight.getArrivalAirport());
@@ -142,7 +142,7 @@ public class FlightRepositoryImpl implements FlightRepository {
             pstmt.setString(7, flight.getStatus());
 
             int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
+            if (affectedRows > 0) {	
                 ResultSet keys = pstmt.getGeneratedKeys();
                 if (keys.next()) {
                     flight.setFlightId(keys.getLong(1));
