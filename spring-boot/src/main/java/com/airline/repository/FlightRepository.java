@@ -2,6 +2,7 @@ package com.airline.repository;
 
 import com.airline.repository.entity.FlightEntity;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface FlightRepository {
@@ -10,4 +11,5 @@ public interface FlightRepository {
     void save(FlightEntity flight);
     void update(FlightEntity flight);
     void delete(Long id);
+    List<FlightEntity> searchFlights(String departureAirport, String arrivalAirport, LocalDate departureDate);
 }

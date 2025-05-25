@@ -3,8 +3,10 @@ package com.airline.api;
 import com.airline.repository.entity.FlightEntity;
 import com.airline.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -45,5 +47,14 @@ public class FlightAPI {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         flightService.deleteFlight(id);
+    }
+    
+    @GetMapping("/search")
+    public List<FlightEntity> searchFlights(
+            @RequestParam String departure,
+            @RequestParam String arrival,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate) {
+
+        return flightService.searchFlights(departure, arrival, departureDate);
     }
 }
