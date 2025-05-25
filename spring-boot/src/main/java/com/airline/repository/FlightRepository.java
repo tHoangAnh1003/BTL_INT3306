@@ -1,7 +1,6 @@
 package com.airline.repository;
 
 import java.util.List;
-
 import com.airline.repository.entity.FlightEntity;
 
 public interface FlightRepository {
@@ -11,4 +10,3 @@ public interface FlightRepository {
     void update(FlightEntity flight);
     void delete(Long id);
 }
-
