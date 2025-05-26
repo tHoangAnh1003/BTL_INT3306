@@ -2,7 +2,6 @@ package com.airline.repository.impl;
 
 import com.airline.repository.AirportRepository;
 
-import javax.sql.DataSource;
 import java.sql.*;
 
 public class AirportRepositoryImpl implements AirportRepository {

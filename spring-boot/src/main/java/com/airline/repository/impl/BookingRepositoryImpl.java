@@ -4,8 +4,6 @@ import com.airline.repository.BookingRepository;
 import com.airline.repository.entity.BookingEntity;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.airline.api;
+package com.airline.api.controller;
 
 import com.airline.repository.entity.BookingEntity;
 import com.airline.service.BookingService;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bookings")
-public class BookingAPI {
+public class BookingController {
 
     @Autowired
     private BookingService bookingService;
