@@ -4,6 +4,9 @@ import com.airline.repository.AirportRepository;
 
 import java.sql.*;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class AirportRepositoryImpl implements AirportRepository {
 
 	private final Connection connection;
@@ -27,5 +30,21 @@ public class AirportRepositoryImpl implements AirportRepository {
         }
 
         return null;
+    }
+    
+    @Override
+    public String findNameById(Long airportId) {
+        String sql = "SELECT name FROM airports WHERE airport_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, airportId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("name");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Unknown";
     }
 }
