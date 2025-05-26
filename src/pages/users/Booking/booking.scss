@@ -1,0 +1,95 @@
+#booking-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #f4f9ff;
+  color: #003366;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #002244;
+  }
+
+  .trip-tabs {
+    display: flex;
+    gap: 8px;
+    li {
+      flex: 1;
+      background: #e4e4e4;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      &.active {
+        background: #003366;
+        color: #fff;
+      }
+    }
+  }
+
+  .recent-box {
+    margin-bottom: 20px;
+  }
+
+  .booking-form {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    input, select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button {
+      grid-column: 1 / -1;
+      padding: 12px 0;
+      background: #003366;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  }
+
+  .flight-result {
+    margin-top: 30px;
+    .flight-card {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      &.selected {
+        border-color: #003366;
+        background: #e6f2ff;
+      }
+    }
+    .confirm-btn {
+      padding: 12px 0;
+      width: 100%;
+      background: #003366;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .msg {
+      margin-top: 10px;
+      color: green;
+    }
+  }
+}

@@ -1,0 +1,38 @@
+#flight-info-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #f4f9ff;
+  color: #003366;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: #002244;
+  }
+
+  .flight-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #003366;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f4f9ff;
+    }
+
+    tr:hover {
+      background-color: #e6f2ff;
+    }
+  }
+}
