@@ -11,4 +11,6 @@ public interface BookingService {
     void updateBooking(BookingEntity booking);
     void deleteBooking(Long id);
     List<BookingEntity> getBookingsByPassengerId(Long passengerId);
+    boolean canCancelBooking(Long bookingId);	
+    boolean cancelBooking(Long bookingId);
 }
