@@ -2,27 +2,20 @@ package com.airline.api.controller;
 
 import com.airline.repository.entity.UserEntity;
 import com.airline.service.UserService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    // 1. Get User by Name
-    @GetMapping("/{username}")
-    public UserEntity getUserByUsername(@PathVariable String username) {
-        UserEntity user = userService.findByUsername(username);
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
-        return user;
-    }
-
-    // 2. Create new User
+    // 1. Create new User
     @PostMapping
     public UserEntity createUser(@RequestBody UserEntity user) {
         if (userService.existsByUsername(user.getUsername())) {
@@ -34,4 +27,15 @@ public class UserController {
         userService.save(user);
         return user;
     }
+    
+    @GetMapping
+    public List<UserEntity> getAllUsers() {
+        return userService.findAll();
+    }
+
+    // GET /api/users/{id}
+    @GetMapping("/{id}")
+    public UserEntity getUserById(@PathVariable Long id) {
+        return userService.findById(id);
+    } 
 }

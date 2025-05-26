@@ -1,5 +1,7 @@
 package com.airline.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,11 +35,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @Override
     public boolean isUsernameTaken(String username) {
         return userRepository.existsByUsername(username);
     }
@@ -50,5 +47,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(UserEntity user) {
         userRepository.save(user);
+    }
+    
+    @Override
+    public List<UserEntity> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public UserEntity findById(Long id) {
+        return userRepository.findById(id);
     }
 } 

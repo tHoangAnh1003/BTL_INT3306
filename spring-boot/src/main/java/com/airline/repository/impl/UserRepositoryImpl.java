@@ -4,6 +4,8 @@ import com.airline.repository.UserRepository;
 import com.airline.repository.entity.UserEntity;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
@@ -15,20 +17,20 @@ public class UserRepositoryImpl implements UserRepository {
         this.connection = connection;
     }
 
-    @Override
-    public UserEntity findByUsername(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return extractUserFromResultSet(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    @Override
+//    public UserEntity findByUsername(String username) {
+//        String sql = "SELECT * FROM users WHERE username = ?";
+//        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+//            pstmt.setString(1, username);
+//            ResultSet rs = pstmt.executeQuery();
+//            if (rs.next()) {
+//                return extractUserFromResultSet(rs);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     @Override
     public void save(UserEntity user) {
@@ -75,6 +77,35 @@ public class UserRepositoryImpl implements UserRepository {
         return false;
     }
 
+    @Override
+    public List<UserEntity> findAll() {
+        List<UserEntity> users = new ArrayList<>();
+        String sql = "SELECT * FROM users";
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                users.add(extractUserFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    @Override
+    public UserEntity findById(Long id) {
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     private UserEntity extractUserFromResultSet(ResultSet rs) throws SQLException {
         UserEntity user = new UserEntity();
         user.setUserId(rs.getLong("user_id"));
