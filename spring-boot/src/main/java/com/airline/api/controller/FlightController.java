@@ -1,12 +1,16 @@
 package com.airline.api.controller;
 
+import com.airline.repository.entity.UserEntity;
 import com.airline.repository.entity.FlightEntity;
 import com.airline.service.FlightService;
 import com.airline.service.UserService;
+import com.airline.utils.AuthUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,22 +38,37 @@ public class FlightController {
 
 	// 3. Create new Flight
 	@PostMapping
-	public FlightEntity create(@RequestBody FlightEntity flight) {
-		flightService.createFlight(flight);
-		return flight;
-	}
+    public void create(@RequestBody FlightEntity flight,
+                             @RequestParam Long requesterId) {
+        UserEntity requester = userService.findById(requesterId);
+        if (!AuthUtil.isAdmin(requester) && !AuthUtil.isStaff(requester)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        flightService.createFlight(flight);
+    }
 
 	// 4. Update Flight by ID
 	@PutMapping("/{id}")
-	public FlightEntity update(@PathVariable Long id, @RequestBody FlightEntity flight) {
+	public void update(@PathVariable Long id,@RequestBody FlightEntity flight, @RequestParam Long requesterId) {
+		UserEntity requester = userService.findById(requesterId);
+		if (!AuthUtil.isAdmin(requester) && !AuthUtil.isStaff(requester)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+		}
+
 		flight.setFlightId(id);
 		flightService.updateFlight(flight);
-		return flight;
 	}
 
 	// 5. Remove Flight by ID
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id) {
+	public void delete(@PathVariable Long id, @RequestParam Long requesterId) {
+		UserEntity requester = userService.findById(requesterId);
+		
+		if (!AuthUtil.isAdmin(requester)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admin can delete");
+		}
+		
 		flightService.deleteFlight(id);
 	}
 
