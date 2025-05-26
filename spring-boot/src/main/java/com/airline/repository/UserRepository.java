@@ -10,4 +10,5 @@ public interface UserRepository {
     boolean existsByEmail(String email);
     List<UserEntity> findAll();
     UserEntity findById(Long id);
+    String getRoleByUserId(Long userId);
 }

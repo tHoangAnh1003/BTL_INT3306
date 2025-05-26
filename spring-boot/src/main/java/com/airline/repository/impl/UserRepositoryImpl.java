@@ -106,6 +106,21 @@ public class UserRepositoryImpl implements UserRepository {
         return null;
     }
     
+    @Override
+    public String getRoleByUserId(Long userId) {
+        String sql = "SELECT role FROM users WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        	pstmt.setLong(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("role");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // "UNKNOWN"
+    }
+    
     private UserEntity extractUserFromResultSet(ResultSet rs) throws SQLException {
         UserEntity user = new UserEntity();
         user.setUserId(rs.getLong("user_id"));

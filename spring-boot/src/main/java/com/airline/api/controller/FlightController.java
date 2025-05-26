@@ -46,8 +46,10 @@ public class FlightController {
 
 	// 3. Create new Flight
 	@PostMapping
-    public void create(@RequestBody FlightEntity flight,
-                             @RequestParam Long requesterId) {
+    public void create(
+            @RequestBody FlightEntity flight,
+            @RequestHeader("X-Requester-Id") Long requesterId) {
+
         UserEntity requester = userService.findById(requesterId);
         if (!AuthUtil.isAdmin(requester) && !AuthUtil.isStaff(requester)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
@@ -58,27 +60,33 @@ public class FlightController {
 
 	// 4. Update Flight by ID
 	@PutMapping("/{id}")
-	public void update(@PathVariable Long id,@RequestBody FlightEntity flight, @RequestParam Long requesterId) {
-		UserEntity requester = userService.findById(requesterId);
-		if (!AuthUtil.isAdmin(requester) && !AuthUtil.isStaff(requester)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
-		}
+    public void update(
+            @PathVariable Long id,
+            @RequestBody FlightEntity flight,
+            @RequestHeader("X-Requester-Id") Long requesterId) {
 
-		flight.setFlightId(id);
-		flightService.updateFlight(flight);
-	}
+        UserEntity requester = userService.findById(requesterId);
+        if (!AuthUtil.isAdmin(requester) && !AuthUtil.isStaff(requester)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        flight.setFlightId(id);
+        flightService.updateFlight(flight);
+    }
 
 	// 5. Remove Flight by ID
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id, @RequestParam Long requesterId) {
-		UserEntity requester = userService.findById(requesterId);
-		
-		if (!AuthUtil.isAdmin(requester)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admin can delete");
-		}
-		
-		flightService.deleteFlight(id);
-	}
+    public void delete(
+            @PathVariable Long id,
+            @RequestHeader("X-Requester-Id") Long requesterId) {
+
+        UserEntity requester = userService.findById(requesterId);
+        if (!AuthUtil.isAdmin(requester)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admin can delete");
+        }
+
+        flightService.deleteFlight(id);
+    }
 
 	@GetMapping("/search")
 	public List<FlightDTO> searchFlights(

@@ -26,7 +26,8 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerEntity getPassengerById(Long id) {
-        return passengerRepository.findById(id);
+        return passengerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Passenger not found."));
     }
 
     @Override

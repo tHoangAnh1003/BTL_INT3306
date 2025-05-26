@@ -29,7 +29,7 @@ public class UserController {
     }
     
     @GetMapping
-    public List<UserEntity> getAllUsers(@RequestParam("requesterId") Long requesterId) {
+    public List<UserEntity> getAllUsers(@RequestHeader("X-Requester-Id") Long requesterId) {
         UserEntity requester = userService.findById(requesterId);
         if (requester == null) {
             throw new RuntimeException("Requester not found");
@@ -39,6 +39,7 @@ public class UserController {
         }
         return userService.findAll();
     }
+
 
     // GET /api/users/{id}
     @GetMapping("/{id}")

@@ -6,6 +6,7 @@ import com.airline.repository.entity.PassengerEntity;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -33,19 +34,36 @@ public class PassengerRepositoryImpl implements PassengerRepository {
         return passengers;
     }
 
+//    @Override
+//    public PassengerEntity findById(Long id) {
+//        String sql = "SELECT * FROM passengers WHERE passenger_id = ?";
+//        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+//            pstmt.setLong(1, id);
+//            ResultSet rs = pstmt.executeQuery();
+//            if (rs.next()) {
+//                return mapResultSetToPassenger(rs);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+    
     @Override
-    public PassengerEntity findById(Long id) {
+    public Optional<PassengerEntity> findById(Long id) {
         String sql = "SELECT * FROM passengers WHERE passenger_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setLong(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return mapResultSetToPassenger(rs);
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    PassengerEntity passenger = mapRowToPassengerEntity(rs);
+                    return Optional.of(passenger);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -97,6 +115,16 @@ public class PassengerRepositoryImpl implements PassengerRepository {
     }
 
     private PassengerEntity mapResultSetToPassenger(ResultSet rs) throws SQLException {
+        PassengerEntity passenger = new PassengerEntity();
+        passenger.setPassengerId(rs.getLong("passenger_id"));
+        passenger.setFullName(rs.getString("full_name"));
+        passenger.setEmail(rs.getString("email"));
+        passenger.setPhone(rs.getString("phone"));
+        passenger.setPassportNumber(rs.getString("passport_number"));
+        return passenger;
+    }
+    
+    private PassengerEntity mapRowToPassengerEntity(ResultSet rs) throws SQLException {
         PassengerEntity passenger = new PassengerEntity();
         passenger.setPassengerId(rs.getLong("passenger_id"));
         passenger.setFullName(rs.getString("full_name"));

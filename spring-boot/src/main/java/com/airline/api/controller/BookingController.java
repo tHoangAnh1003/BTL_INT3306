@@ -1,4 +1,4 @@
-package com.airline.api.controller;
+ package com.airline.api.controller;
 
 import com.airline.repository.entity.UserEntity;
 import com.airline.repository.entity.BookingEntity;
@@ -25,12 +25,15 @@ public class BookingController {
 
     // 1. Get all Bookings
     @GetMapping
-    public List<BookingEntity> getAll(@RequestParam Long requesterId) {
+    public List<BookingEntity> getAll(
+            @RequestHeader("X-Requester-Id") Long requesterId) {
+
         UserEntity requester = userService.findById(requesterId);
+
         if ("ADMIN".equalsIgnoreCase(requester.getRole())) {
             return bookingService.getAllBookings();
         } else {
-            return bookingService.getBookingsByPassengerId(requesterId); 
+            return bookingService.getBookingsByPassengerId(requesterId);
         }
     }
 
@@ -42,24 +45,35 @@ public class BookingController {
 
     // 3. Create new Booking
     @PostMapping
-    public BookingEntity create(@RequestBody BookingEntity booking, @RequestParam Long requesterId) {
+    public BookingEntity create(
+            @RequestHeader("X-Requester-Id") Long requesterId,
+            @RequestBody BookingEntity booking) {
+
         UserEntity requester = userService.findById(requesterId);
         if (!AuthUtil.isCustomer(requester)) {
-            throw new RuntimeException("Only Customers can create bookings.");
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Only Customers can create bookings.");
         }
-        booking.setPassengerId(requesterId); 
+
+        booking.setPassengerId(requesterId);
         bookingService.createBooking(booking);
         return booking;
     }
 
     // 4. Update Booking by ID
     @PutMapping("/{id}")
-    public BookingEntity update(@PathVariable Long id, @RequestBody BookingEntity booking, @RequestParam Long requesterId) {
+    public BookingEntity update(
+            @PathVariable Long id,
+            @RequestHeader("X-Requester-Id") Long requesterId,
+            @RequestBody BookingEntity booking) {
+
         UserEntity requester = userService.findById(requesterId);
         BookingEntity existing = bookingService.getBookingById(id);
 
-        if (!AuthUtil.isAdmin(requester) && !existing.getPassengerId().equals(requesterId)) {
-            throw new RuntimeException("Access denied: You can only update your own bookings.");
+        if (!AuthUtil.isAdmin(requester)
+                && !existing.getPassengerId().equals(requesterId)) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "Access denied: You can only update your own bookings.");
         }
 
         booking.setBookingId(id);
@@ -71,31 +85,33 @@ public class BookingController {
     @DeleteMapping("/{id}")
     public void delete(
             @PathVariable Long id,
-            @RequestParam Long requesterId) {
+            @RequestHeader("X-Requester-Id") Long requesterId) {
 
         UserEntity requester = userService.findById(requesterId);
-        BookingEntity booking = bookingService.getBookingById(id);
+        BookingEntity existing = bookingService.getBookingById(id);
 
         if (!AuthUtil.isAdmin(requester)
-                && !booking.getPassengerId().equals(requesterId)) {
+                && !existing.getPassengerId().equals(requesterId)) {
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "Access denied");
+                HttpStatus.FORBIDDEN, "Access denied");
         }
 
         bookingService.deleteBooking(id);
     }
     
     @GetMapping("/passenger/{passengerId}")
-    public List<BookingEntity> getBookingsByPassengerId(
-        @PathVariable Long passengerId,
-        @RequestParam Long requesterId
-    ) {
+    public List<BookingEntity> getByPassengerId(
+            @PathVariable Long passengerId,
+            @RequestHeader("X-Requester-Id") Long requesterId) {
+
         UserEntity requester = userService.findById(requesterId);
 
-        if (AuthUtil.isAdmin(requester) || Objects.equals(requester.getUserId(), passengerId)) {
+        if (AuthUtil.isAdmin(requester) 
+                || requesterId.equals(passengerId)) {
             return bookingService.getBookingsByPassengerId(passengerId);
         }
 
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN, "Access denied");
     }
 }
