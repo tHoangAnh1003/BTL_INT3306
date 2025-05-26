@@ -29,7 +29,14 @@ public class UserController {
     }
     
     @GetMapping
-    public List<UserEntity> getAllUsers() {
+    public List<UserEntity> getAllUsers(@RequestParam("requesterId") Long requesterId) {
+        UserEntity requester = userService.findById(requesterId);
+        if (requester == null) {
+            throw new RuntimeException("Requester not found");
+        }
+        if (!"ADMIN".equalsIgnoreCase(requester.getRole())) {
+            throw new RuntimeException("Access denied. Only ADMIN can view all users.");
+        }
         return userService.findAll();
     }
 

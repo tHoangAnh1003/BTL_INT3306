@@ -122,4 +122,22 @@ public class BookingRepositoryImpl implements BookingRepository {
         booking.setStatus(rs.getString("status"));
         return booking;
     }
+    
+    @Override
+    public List<BookingEntity> findByPassengerId(Long passengerId) {
+        String sql = "SELECT * FROM bookings WHERE passenger_id = ?";
+        List<BookingEntity> bookings = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setLong(1, passengerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    BookingEntity booking = mapRowToBookingEntity(rs);
+                    bookings.add(booking);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return bookings;
+    }
 }

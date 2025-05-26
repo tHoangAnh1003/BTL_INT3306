@@ -91,7 +91,7 @@ public class UserRepositoryImpl implements UserRepository {
         return users;
     }
 
-    @Override
+    @Override 
     public UserEntity findById(Long id) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

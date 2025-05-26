@@ -2,6 +2,8 @@ package com.airline.api.controller;
 
 import com.airline.repository.entity.FlightEntity;
 import com.airline.service.FlightService;
+import com.airline.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,8 @@ public class FlightController {
 
 	@Autowired
 	private FlightService flightService;
+	@Autowired
+	private UserService userService;
 
 	// 1. Get All Flights
 	@GetMapping

@@ -11,4 +11,5 @@ public interface BookingRepository {
     void save(BookingEntity booking);
     void update(BookingEntity booking);
     void delete(Long id);
+    List<BookingEntity> findByPassengerId(Long passengerId);
 }
