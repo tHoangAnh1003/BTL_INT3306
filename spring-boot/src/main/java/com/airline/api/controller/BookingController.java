@@ -4,11 +4,15 @@ import com.airline.repository.entity.UserEntity;
 import com.airline.repository.entity.BookingEntity;
 import com.airline.service.BookingService;
 import com.airline.service.UserService;
+import com.airline.utils.AuthUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -40,8 +44,8 @@ public class BookingController {
     @PostMapping
     public BookingEntity create(@RequestBody BookingEntity booking, @RequestParam Long requesterId) {
         UserEntity requester = userService.findById(requesterId);
-        if (!"USER".equalsIgnoreCase(requester.getRole())) {
-            throw new RuntimeException("Only USERs can create bookings.");
+        if (!AuthUtil.isCustomer(requester)) {
+            throw new RuntimeException("Only Customers can create bookings.");
         }
         booking.setPassengerId(requesterId); 
         bookingService.createBooking(booking);
@@ -54,7 +58,7 @@ public class BookingController {
         UserEntity requester = userService.findById(requesterId);
         BookingEntity existing = bookingService.getBookingById(id);
 
-        if (!"ADMIN".equalsIgnoreCase(requester.getRole()) && !existing.getPassengerId().equals(requesterId)) {
+        if (!AuthUtil.isAdmin(requester) && !existing.getPassengerId().equals(requesterId)) {
             throw new RuntimeException("Access denied: You can only update your own bookings.");
         }
 
@@ -65,14 +69,33 @@ public class BookingController {
 
     // 5. Remove Booking
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id, @RequestParam Long requesterId) {
+    public void delete(
+            @PathVariable Long id,
+            @RequestParam Long requesterId) {
+
         UserEntity requester = userService.findById(requesterId);
         BookingEntity booking = bookingService.getBookingById(id);
 
-        if (!"ADMIN".equalsIgnoreCase(requester.getRole()) && !booking.getPassengerId().equals(requesterId)) {
-            throw new RuntimeException("Access denied: You can only delete your own bookings.");
+        if (!AuthUtil.isAdmin(requester)
+                && !booking.getPassengerId().equals(requesterId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Access denied");
         }
 
         bookingService.deleteBooking(id);
+    }
+    
+    @GetMapping("/passenger/{passengerId}")
+    public List<BookingEntity> getBookingsByPassengerId(
+        @PathVariable Long passengerId,
+        @RequestParam Long requesterId
+    ) {
+        UserEntity requester = userService.findById(requesterId);
+
+        if (AuthUtil.isAdmin(requester) || Objects.equals(requester.getUserId(), passengerId)) {
+            return bookingService.getBookingsByPassengerId(passengerId);
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
     }
 }
