@@ -4,7 +4,9 @@ package com.airline.api.controller;
 import com.airline.repository.entity.NewsEntity;
 import com.airline.service.NewsService;
 import com.airline.service.UserService;
+import com.airline.utils.AuthUtil;
 import com.airline.repository.entity.UserEntity;
+import com.airline.security.JwtAuthenticationFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,8 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/news")
@@ -38,61 +43,44 @@ public class NewsController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(
-            @RequestHeader("X-Requester-Id") Long requesterId,
-            @RequestBody NewsEntity news) {
-        UserEntity user = userService.findById(requesterId);
-        String role = user.getRole();
-        if (!"Admin".equalsIgnoreCase(role) && !"Staff".equalsIgnoreCase(role)) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Bạn không có quyền tạo tin.");
-            return ResponseEntity.badRequest().body(response);
-
+    public ResponseEntity<?> create(HttpServletRequest request,
+                                    @RequestBody NewsEntity news) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Collections.singletonMap("message", "Bạn không có quyền tạo tin."));
         }
         news.setAuthor(user.getUsername());
         newsService.createNews(news);
-        Map<String, Object> response = new HashMap<>();
-        response.put("msg", "Đã tạo tin thành công");
-        response.put("id", news.getNewsId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("msg", "Đã tạo tin thành công");
+        resp.put("id", news.getNewsId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(
-            @PathVariable Long id,
-            @RequestHeader("X-Requester-Id") Long requesterId,
-            @RequestBody NewsEntity news) {
-        UserEntity user = userService.findById(requesterId);
-        String role = user.getRole();
-        if (!"Admin".equalsIgnoreCase(role) && !"Staff".equalsIgnoreCase(role)) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Bạn không có quyền sửa tin.");
-            return ResponseEntity.badRequest().body(response);
+    public ResponseEntity<?> update(HttpServletRequest request,
+                                    @PathVariable Long id,
+                                    @RequestBody NewsEntity news) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Collections.singletonMap("message", "Bạn không có quyền sửa tin."));
         }
         news.setNewsId(id);
         newsService.updateNews(news);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Cập nhật tin thành công");
-        return ResponseEntity.badRequest().body(response);
-
+        return ResponseEntity.ok(Collections.singletonMap("message", "Cập nhật tin thành công"));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(
-            @PathVariable Long id,
-            @RequestHeader("X-Requester-Id") Long requesterId) {
-        UserEntity user = userService.findById(requesterId);
-        String role = user.getRole();
-        if (!"Admin".equalsIgnoreCase(role)) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Chỉ Admin mới có quyền xoá tin.");
-            return ResponseEntity.badRequest().body(response);
-
+    public ResponseEntity<?> delete(HttpServletRequest request,
+                                    @PathVariable Long id) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (!AuthUtil.isAdmin(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Collections.singletonMap("message", "Chỉ Admin mới có quyền xoá tin."));
         }
         newsService.deleteNews(id);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Xoá tin thành công");
-        return ResponseEntity.badRequest().body(response);
-
+        return ResponseEntity.ok(Collections.singletonMap("message", "Xoá tin thành công"));
     }
 }

@@ -1,12 +1,18 @@
 package com.airline.api.controller;
 
 import com.airline.repository.entity.UserEntity;
+import com.airline.security.JwtAuthenticationFilter;
 import com.airline.service.UserService;
+import com.airline.utils.AuthUtil;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,13 +35,10 @@ public class UserController {
     }
     
     @GetMapping
-    public List<UserEntity> getAllUsers(@RequestHeader("X-Requester-Id") Long requesterId) {
-        UserEntity requester = userService.findById(requesterId);
-        if (requester == null) {
-            throw new RuntimeException("Requester not found");
-        }
-        if (!"ADMIN".equalsIgnoreCase(requester.getRole())) {
-            throw new RuntimeException("Access denied. Only ADMIN can view all users.");
+    public List<UserEntity> getAllUsers(HttpServletRequest request) {
+        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (!AuthUtil.isAdmin(requester)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only ADMIN can view users.");
         }
         return userService.findAll();
     }

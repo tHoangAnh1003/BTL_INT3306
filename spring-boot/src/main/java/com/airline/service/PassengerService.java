@@ -8,6 +8,6 @@ public interface PassengerService {
     List<PassengerEntity> getAllPassengers();
     PassengerEntity getPassengerById(Long id);
     void createPassenger(PassengerEntity passenger);
-    void updatePassenger(PassengerEntity passenger);
+    PassengerEntity updatePassenger(PassengerEntity passenger);
     void deletePassenger(Long id);
 }

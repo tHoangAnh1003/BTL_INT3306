@@ -36,8 +36,10 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public void updatePassenger(PassengerEntity passenger) {
+    public PassengerEntity updatePassenger(PassengerEntity passenger) {
         passengerRepository.update(passenger);
+        return passengerRepository.findById(passenger.getPassengerId())
+                                  .orElseThrow(() -> new RuntimeException("Không tìm thấy hành khách sau khi cập nhật"));
     }
 
     @Override

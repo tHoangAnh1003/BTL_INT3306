@@ -1,6 +1,7 @@
 package com.airline.api.controller;
 
 import com.airline.repository.entity.UserEntity;
+import com.airline.security.JwtAuthenticationFilter;
 import com.airline.DTO.FlightDTO;
 import com.airline.converter.FlightConverter;
 import com.airline.repository.entity.FlightEntity;
@@ -17,6 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/flights")
@@ -46,45 +49,36 @@ public class FlightController {
 
 	// 3. Create new Flight
 	@PostMapping
-    public void create(
-            @RequestBody FlightEntity flight,
-            @RequestHeader("X-Requester-Id") Long requesterId) {
-
-        UserEntity requester = userService.findById(requesterId);
+    public void create(HttpServletRequest request,
+                       @RequestBody FlightEntity flight) {
+        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
         if (!AuthUtil.isAdmin(requester) && !AuthUtil.isStaff(requester)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
-
         flightService.createFlight(flight);
     }
 
 	// 4. Update Flight by ID
 	@PutMapping("/{id}")
-    public void update(
-            @PathVariable Long id,
-            @RequestBody FlightEntity flight,
-            @RequestHeader("X-Requester-Id") Long requesterId) {
-
-        UserEntity requester = userService.findById(requesterId);
+    public void update(HttpServletRequest request,
+                       @PathVariable Long id,
+                       @RequestBody FlightEntity flight) {
+        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
         if (!AuthUtil.isAdmin(requester) && !AuthUtil.isStaff(requester)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
-
         flight.setFlightId(id);
         flightService.updateFlight(flight);
     }
 
 	// 5. Remove Flight by ID
 	@DeleteMapping("/{id}")
-    public void delete(
-            @PathVariable Long id,
-            @RequestHeader("X-Requester-Id") Long requesterId) {
-
-        UserEntity requester = userService.findById(requesterId);
+    public void delete(HttpServletRequest request,
+                       @PathVariable Long id) {
+        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
         if (!AuthUtil.isAdmin(requester)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admin can delete");
         }
-
         flightService.deleteFlight(id);
     }
 
