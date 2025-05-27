@@ -11,4 +11,5 @@ public interface UserRepository {
     List<UserEntity> findAll();
     UserEntity findById(Long id);
     String getRoleByUserId(Long userId);
+    UserEntity findByEmail(String email);
 }

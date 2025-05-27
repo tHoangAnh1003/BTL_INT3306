@@ -121,6 +121,26 @@ public class UserRepositoryImpl implements UserRepository {
         return null; // "UNKNOWN"
     }
     
+    @Override
+    public UserEntity findByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                UserEntity user = new UserEntity();
+                user.setUserId(rs.getLong("user_id"));
+                user.setEmail(rs.getString("email"));
+                user.setPasswordHash(rs.getString("password_hash"));
+                user.setRole(rs.getString("role"));
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     private UserEntity extractUserFromResultSet(ResultSet rs) throws SQLException {
         UserEntity user = new UserEntity();
         user.setUserId(rs.getLong("user_id"));
