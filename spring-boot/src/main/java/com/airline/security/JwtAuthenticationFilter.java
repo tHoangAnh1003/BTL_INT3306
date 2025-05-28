@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter implements Filter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            if (jwtUtil.validateToken(token)) {
+            if (jwtUtil.isTokenValid(token)) {
                 Long userId = jwtUtil.getUserIdFromToken(token);
                 UserEntity user = userRepository.findById(userId);
                 if (user != null) {

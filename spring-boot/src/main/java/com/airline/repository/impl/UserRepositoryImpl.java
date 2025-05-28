@@ -141,12 +141,38 @@ public class UserRepositoryImpl implements UserRepository {
         return null;
     }
     
+    @Override
+    public UserEntity findByEmailAndPassword(String email, String password) {
+        String sql = "SELECT * FROM users WHERE email = ? AND password_hash = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            pstmt.setString(2, password); 
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     private UserEntity extractUserFromResultSet(ResultSet rs) throws SQLException {
         UserEntity user = new UserEntity();
         user.setUserId(rs.getLong("user_id"));
         user.setUsername(rs.getString("username"));
         user.setPasswordHash(rs.getString("password_hash"));
         user.setEmail(rs.getString("email"));
+        user.setRole(rs.getString("role"));
+        return user;
+    }
+    
+    private UserEntity mapRow(ResultSet rs) throws SQLException {
+        UserEntity user = new UserEntity();
+        user.setUserId(rs.getLong("user_id"));
+        user.setUsername(rs.getString("username"));
+        user.setEmail(rs.getString("email"));
+        user.setPasswordHash(rs.getString("password_hash"));
         user.setRole(rs.getString("role"));
         return user;
     }
