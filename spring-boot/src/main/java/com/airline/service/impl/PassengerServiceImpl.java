@@ -1,10 +1,13 @@
 package com.airline.service.impl;
 
 import com.airline.repository.PassengerRepository;
-import com.airline.repository.entity.PassengerEntity;
+import com.airline.DTO.PassengerDTO;
+import com.airline.converter.PassengerConverter;
+import com.airline.entity.PassengerEntity;
 import com.airline.service.PassengerService;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +18,8 @@ public class PassengerServiceImpl implements PassengerService {
 	@Autowired
     private PassengerRepository passengerRepository;
 
-    public PassengerServiceImpl(PassengerRepository passengerRepository) {
-        this.passengerRepository = passengerRepository;
-    }
+    @Autowired
+    private PassengerConverter passengerConverter;
 
     @Override
     public List<PassengerEntity> getAllPassengers() {
@@ -37,13 +39,36 @@ public class PassengerServiceImpl implements PassengerService {
 
     @Override
     public PassengerEntity updatePassenger(PassengerEntity passenger) {
-        passengerRepository.update(passenger);
-        return passengerRepository.findById(passenger.getPassengerId())
-                                  .orElseThrow(() -> new RuntimeException("Không tìm thấy hành khách sau khi cập nhật"));
+        return passengerRepository.save(passenger);
     }
 
     @Override
     public void deletePassenger(Long id) {
-        passengerRepository.delete(id);
+        passengerRepository.deleteById(id);
+    }
+
+    @Override
+    public PassengerDTO getPassengerDTOById(Long id) {
+        return passengerRepository.findById(id)
+                .map(passengerConverter::toDTO)
+                .orElse(null); // hoặc throw new ResponseStatusException(HttpStatus.NOT_FOUND)
+    }
+
+    @Override
+    public PassengerDTO updatePassenger(Long id, PassengerDTO dto) {
+        Optional<PassengerEntity> existingOpt = passengerRepository.findById(id);
+        if (existingOpt.isPresent()) {
+            return null; // hoặc throw new ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+
+        PassengerEntity existing = existingOpt.get();
+
+        existing.setFullName(dto.getFullName());
+        existing.setEmail(dto.getEmail());
+        existing.setPhone(dto.getPhone());
+        existing.setPassportNumber(dto.getPassportNumber());
+
+        PassengerEntity saved = passengerRepository.save(existing);
+        return passengerConverter.toDTO(saved);
     }
 }

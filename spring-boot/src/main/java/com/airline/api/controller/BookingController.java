@@ -1,10 +1,11 @@
  package com.airline.api.controller;
 
-import com.airline.repository.entity.UserEntity;
+import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
-import com.airline.repository.entity.BookingEntity;
+import com.airline.DTO.BookingResponseDTO;
+import com.airline.converter.BookingConverter;
+import com.airline.entity.BookingEntity;
 import com.airline.service.BookingService;
-import com.airline.service.UserService;
 import com.airline.utils.AuthUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,99 +28,100 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
-    @Autowired
-    private UserService userService;
 
-    // 1. Get all Bookings
     @GetMapping
-    public List<BookingEntity> getAll(HttpServletRequest request) {
-        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (AuthUtil.isAdmin(requester)) {
-            return bookingService.getAllBookings();
-        } else {
-            return bookingService.getBookingsByPassengerId(requester.getUserId());
-        }
+    public ResponseEntity<List<BookingResponseDTO>> getAll(HttpServletRequest request) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        List<BookingEntity> bookings = AuthUtil.isAdmin(user)
+                ? bookingService.getAllBookings()
+                : bookingService.getBookingsByPassengerId(user.getId());
+
+        List<BookingResponseDTO> dtoList = bookings.stream()
+        	    .map(BookingConverter::toDTO)
+        	    .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
     }
 
-    // 2. Get Booking by ID
     @GetMapping("/{id}")
-    public BookingEntity getById(@PathVariable Long id) {
-        return bookingService.getBookingById(id);
+    public ResponseEntity<BookingResponseDTO> getById(@PathVariable Long id) {
+        BookingEntity booking = bookingService.getBookingById(id);
+        return ResponseEntity.ok(BookingConverter.toDTO(booking));
     }
 
-    // 3. Create new Booking
+
     @PostMapping
-    public ResponseEntity<Map<String, Object>> create(HttpServletRequest request,
-                                                      @RequestBody BookingEntity booking) {
-        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (!AuthUtil.isCustomer(requester)) {
+    public ResponseEntity<Map<String, Object>> createBooking(HttpServletRequest request,
+                                                             @RequestBody BookingEntity booking) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+
+        if (!AuthUtil.isCustomer(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Collections.singletonMap("msg", "Chỉ khách hàng mới được đặt vé"));
         }
-        booking.setPassengerId(requester.getUserId());
+
+        booking.setPassengerId(user.getId());
         bookingService.createBooking(booking);
+
         Map<String, Object> resp = new HashMap<>();
         resp.put("msg", "Đặt vé thành công");
-        resp.put("bookingId", booking.getBookingId());
+        resp.put("bookingId", booking.getId());
+
         return ResponseEntity.ok(resp);
     }
 
-
-    // 4. Update Booking by ID
     @PutMapping("/{id}")
-    public BookingEntity update(HttpServletRequest request,
-                                @PathVariable Long id,
-                                @RequestBody BookingEntity booking) {
-        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+    public ResponseEntity<BookingEntity> updateBooking(HttpServletRequest request,
+                                                       @PathVariable Long id,
+                                                       @RequestBody BookingEntity booking) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
         BookingEntity existing = bookingService.getBookingById(id);
-        if (!AuthUtil.isAdmin(requester)
-            && !existing.getPassengerId().equals(requester.getUserId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "You can only update your own bookings.");
+
+        if (!AuthUtil.isAdmin(user) && !existing.getPassengerId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa đặt vé này.");
         }
-        booking.setBookingId(id);
+
+        booking.setId(id);
         bookingService.updateBooking(booking);
-        return booking;
+        return ResponseEntity.ok(booking);
     }
 
-    // 5. Remove Booking
     @DeleteMapping("/{id}")
-    public void delete(HttpServletRequest request,
-                       @PathVariable Long id) {
-        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+    public ResponseEntity<?> deleteBooking(HttpServletRequest request,
+                                           @PathVariable Long id) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
         BookingEntity existing = bookingService.getBookingById(id);
-        if (!AuthUtil.isAdmin(requester)
-            && !existing.getPassengerId().equals(requester.getUserId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+
+        if (!AuthUtil.isAdmin(user) && !existing.getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền hủy đặt vé này.");
         }
+
         bookingService.deleteBooking(id);
+        return ResponseEntity.ok(Collections.singletonMap("msg", "Đã xóa thành công"));
     }
-    
+
     @GetMapping("/passenger/{passengerId}")
-    public List<BookingEntity> getByPassengerId(HttpServletRequest request,
-                                                @PathVariable Long passengerId) {
-        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (AuthUtil.isAdmin(requester)
-            || requester.getUserId().equals(passengerId)) {
-            return bookingService.getBookingsByPassengerId(passengerId);
+    public ResponseEntity<List<BookingEntity>> getByPassenger(HttpServletRequest request,
+                                                              @PathVariable Long passengerId) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (AuthUtil.isAdmin(user) || user.getId().equals(passengerId)) {
+            return ResponseEntity.ok(bookingService.getBookingsByPassengerId(passengerId));
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
     }
-   
+
     @GetMapping("/{id}/can-cancel")
     public ResponseEntity<Boolean> canCancel(@PathVariable Long id) {
-        boolean canCancel = bookingService.canCancelBooking(id);
-        return ResponseEntity.ok(canCancel);
+        return ResponseEntity.ok(bookingService.canCancelBooking(id));
     }
 
     @PostMapping("/{id}/cancel")
     public ResponseEntity<String> cancelBooking(@PathVariable Long id) {
         boolean result = bookingService.cancelBooking(id);
         if (result) {
-            return ResponseEntity.ok("Booking cancelled successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Cannot cancel booking: past allowed cancellation deadline or invalid status.");
+            return ResponseEntity.ok("Đã hủy đặt vé thành công.");
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Không thể hủy: đã quá hạn hoặc trạng thái không hợp lệ.");
     }
 }
+

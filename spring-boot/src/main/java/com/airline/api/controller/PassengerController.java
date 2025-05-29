@@ -1,51 +1,63 @@
 package com.airline.api.controller;
 
-import com.airline.repository.entity.UserEntity;
-import com.airline.repository.PassengerRepository;
-import com.airline.repository.UserRepository;
-import com.airline.repository.entity.PassengerEntity;
+import com.airline.DTO.PassengerDTO;
+import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.service.PassengerService;
 import com.airline.utils.AuthUtil;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/passengers")
 public class PassengerController {
 
-	@Autowired private PassengerRepository passengerRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private PassengerService passengerService;
+    @Autowired
+    private PassengerService passengerService;
 
+    // 1. Get passenger info 
     @GetMapping("/{passengerId}")
     public ResponseEntity<?> getPassengerById(HttpServletRequest request,
                                               @PathVariable Long passengerId) {
         UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (!AuthUtil.isCustomer(requester) || !requester.getUserId().equals(passengerId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Bạn chỉ xem/sửa chính mình.");
+
+        if (!AuthUtil.isCustomer(requester) || !requester.getId().equals(passengerId)) {
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("message", "Bạn chỉ có quyền truy cập thông tin của chính mình.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
         }
-        PassengerEntity p = passengerService.getPassengerById(passengerId);
-        return ResponseEntity.ok(p);
+
+        PassengerDTO dto = passengerService.getPassengerDTOById(passengerId);
+        if (dto == null) {
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("message", "Không tìm thấy thông tin hành khách.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
+        }
+
+        return ResponseEntity.ok(dto);
     }
 
+    // 2. Update passenger info 
     @PutMapping("/{passengerId}")
     public ResponseEntity<?> updatePassenger(HttpServletRequest request,
                                              @PathVariable Long passengerId,
-                                             @RequestBody PassengerEntity update) {
+                                             @RequestBody PassengerDTO updateDto) {
         UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (!AuthUtil.isCustomer(requester) || !requester.getUserId().equals(passengerId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Bạn chỉ xem/sửa chính mình.");
+
+        if (!AuthUtil.isCustomer(requester) || !requester.getId().equals(passengerId)) {
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("message", "Bạn chỉ có quyền cập nhật thông tin của chính mình.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resp);
         }
-        update.setPassengerId(passengerId);
-        PassengerEntity saved = passengerService.updatePassenger(update);
-        return ResponseEntity.ok(saved);
+
+        PassengerDTO updated = passengerService.updatePassenger(passengerId, updateDto);
+        return ResponseEntity.ok(updated);
     }
 }

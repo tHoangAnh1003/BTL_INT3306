@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import org.springframework.stereotype.Component;
 
 import com.airline.builder.PaymentBuilder;
-import com.airline.repository.entity.PaymentEntity;
+import com.airline.entity.PaymentEntity;
 import com.airline.utils.MapUtils;
 
 @Component
@@ -14,8 +14,8 @@ public class PaymentConverter {
 
     public PaymentEntity toPaymentEntity(Map<String, Object> map) {
         PaymentEntity payment = new PaymentEntity();
-        payment.setPaymentId(MapUtils.getObject(map, "payment_id", Long.class));
-        payment.setBookingId(MapUtils.getObject(map, "booking_id", Long.class));
+        payment.setId(MapUtils.getObject(map, "payment_id", Long.class));
+        payment.setId(MapUtils.getObject(map, "booking_id", Long.class));
         payment.setAmount(MapUtils.getObject(map, "amount", Double.class));
 
         Timestamp payDate = MapUtils.getObject(map, "payment_date", Timestamp.class);

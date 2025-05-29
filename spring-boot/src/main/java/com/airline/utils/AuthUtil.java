@@ -1,6 +1,6 @@
 package com.airline.utils;
 
-import com.airline.repository.entity.UserEntity;
+import com.airline.entity.UserEntity;
 
 public class AuthUtil {
     public static boolean isAdmin(UserEntity user) {

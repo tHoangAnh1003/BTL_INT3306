@@ -1,18 +1,19 @@
 package com.airline.api.controller;
 
-import com.airline.repository.entity.UserEntity;
+import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.service.UserService;
 import com.airline.utils.AuthUtil;
-
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,30 +24,56 @@ public class UserController {
 
     // 1. Create new User
     @PostMapping
-    public UserEntity createUser(@RequestBody UserEntity user) {
+    public ResponseEntity<?> createUser(@RequestBody UserEntity user) {
+        Map<String, Object> resp = new HashMap<>();
+
         if (userService.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            resp.put("message", "Tên người dùng đã tồn tại.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
         }
+
         if (userService.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            resp.put("message", "Email đã tồn tại.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
         }
+
         userService.save(user);
-        return user;
+        resp.put("message", "Tạo người dùng thành công.");
+        resp.put("userId", user.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
-    
+
+    // 2. Get all users (only ADMIN)
     @GetMapping
-    public List<UserEntity> getAllUsers(HttpServletRequest request) {
+    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
         UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+
         if (!AuthUtil.isAdmin(requester)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only ADMIN can view users.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Collections.singletonMap("message", "Chỉ Admin được phép xem danh sách người dùng."));
         }
-        return userService.findAll();
+
+        List<UserEntity> users = userService.findAll();
+        return ResponseEntity.ok(users);
     }
 
-
-    // GET /api/users/{id}
+    // 3. Get specific user by ID
     @GetMapping("/{id}")
-    public UserEntity getUserById(@PathVariable Long id) {
-        return userService.findById(id);
-    } 
+    public ResponseEntity<?> getUserById(HttpServletRequest request, @PathVariable Long id) {
+        UserEntity requester = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+
+        // Cho phép Admin hoặc chính chủ được xem
+        if (!AuthUtil.isAdmin(requester) && !requester.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Collections.singletonMap("message", "Bạn chỉ được xem thông tin của chính mình."));
+        }
+
+        UserEntity user = userService.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "Không tìm thấy người dùng."));
+        }
+
+        return ResponseEntity.ok(user);
+    }
 }

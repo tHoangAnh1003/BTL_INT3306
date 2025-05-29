@@ -1,15 +1,29 @@
 package com.airline.repository;
 
-import com.airline.repository.entity.FlightEntity;
+import com.airline.entity.FlightEntity;
+import java.time.LocalDateTime;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public interface FlightRepository {
-    List<FlightEntity> findAll();
-    FlightEntity findById(Long id);
-    void save(FlightEntity flight);
-    void update(FlightEntity flight);
-    void delete(Long id);
-    List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate, Long flightId, String status);
+@Repository
+public interface FlightRepository extends JpaRepository<FlightEntity, Long> {
+
+	@Query("SELECT f FROM FlightEntity f " +
+		       "JOIN f.departureAirport da " +
+		       "JOIN f.arrivalAirport aa " +
+		       "WHERE da.name = :departure AND aa.name = :arrival " +
+		       "AND f.departureTime BETWEEN :startOfDay AND :endOfDay")
+		List<FlightEntity> searchFlightsByAirportNames(
+		        @Param("departure") String departure,
+		        @Param("arrival") String arrival,
+		        @Param("startOfDay") LocalDateTime startOfDay,
+		        @Param("endOfDay") LocalDateTime endOfDay
+		);
+
 }

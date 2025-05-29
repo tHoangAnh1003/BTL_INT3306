@@ -1,15 +1,13 @@
 package com.airline.repository;
 
+import com.airline.entity.BookingEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import com.airline.repository.entity.BookingEntity;
-
-public interface BookingRepository {
-    List<BookingEntity> findAll();
-    BookingEntity findById(Long id);
-    void save(BookingEntity booking);
-    void update(BookingEntity booking);
-    void delete(Long id);
-    List<BookingEntity> findByPassengerId(Long passengerId);
+@Repository
+public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
+    List<BookingEntity> findByPassenger_Id(Long passengerId);
 }
+

@@ -1,6 +1,6 @@
 package com.airline.service;
 
-import com.airline.repository.entity.PaymentEntity;
+import com.airline.entity.PaymentEntity;
 
 import java.util.List;
 

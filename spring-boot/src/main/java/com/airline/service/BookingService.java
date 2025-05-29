@@ -1,8 +1,7 @@
 package com.airline.service;
 
 import java.util.List;
-
-import com.airline.repository.entity.BookingEntity;
+import com.airline.entity.BookingEntity;
 
 public interface BookingService {
     List<BookingEntity> getAllBookings();

@@ -1,30 +1,25 @@
 package com.airline.service.impl;
 
 import com.airline.repository.FlightRepository;
-import com.airline.repository.entity.FlightEntity;
-import com.airline.repository.impl.FlightRepositoryImpl;
+import com.airline.entity.FlightEntity;
 import com.airline.service.FlightService;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class FlightServiceImpl implements FlightService {
 
-	private final FlightRepository flightRepository;
-    private final DataSource dataSource;
+    private final FlightRepository flightRepository;
 
     @Autowired
-    public FlightServiceImpl(FlightRepository flightRepository, DataSource dataSource) {
+    public FlightServiceImpl(FlightRepository flightRepository) {
         this.flightRepository = flightRepository;
-        this.dataSource = dataSource;
     }
 
     @Override
@@ -34,7 +29,8 @@ public class FlightServiceImpl implements FlightService {
 
     @Override
     public FlightEntity getFlightById(Long id) {
-        return flightRepository.findById(id);
+        Optional<FlightEntity> optionalFlight = flightRepository.findById(id);
+        return optionalFlight.orElse(null);
     }
 
     @Override
@@ -44,22 +40,18 @@ public class FlightServiceImpl implements FlightService {
 
     @Override
     public void updateFlight(FlightEntity flight) {
-        flightRepository.update(flight);
+        flightRepository.save(flight);
     }
 
     @Override
     public void deleteFlight(Long id) {
-        flightRepository.delete(id);
+        flightRepository.deleteById(id);
     }
 
-    @Override
-    public List<FlightEntity> searchFlights(String departureAirportName, String arrivalAirportName, LocalDate departureDate, Long flightId, String status) {
-        try (Connection connection = dataSource.getConnection()) {
-            FlightRepository flightRepository = new FlightRepositoryImpl(connection);
-            return flightRepository.searchFlights(departureAirportName, arrivalAirportName, departureDate, flightId, status);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Database error", e);
-        }
+    public List<FlightEntity> searchFlights(String departure, String arrival, LocalDate departureDate) {
+        LocalDateTime startOfDay = departureDate.atStartOfDay();
+        LocalDateTime endOfDay = departureDate.plusDays(1).atStartOfDay();
+        return flightRepository.searchFlightsByAirportNames(departure, arrival, startOfDay, endOfDay);
     }
+
 }

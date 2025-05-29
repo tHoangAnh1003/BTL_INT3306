@@ -1,7 +1,7 @@
 package com.airline.service;
 
 import java.util.List;
-import com.airline.repository.entity.NewsEntity;
+import com.airline.entity.NewsEntity;
 
 public interface NewsService {
     List<NewsEntity> getAllNews();

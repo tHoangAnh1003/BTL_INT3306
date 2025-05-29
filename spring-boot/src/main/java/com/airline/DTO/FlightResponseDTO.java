@@ -2,60 +2,59 @@ package com.airline.DTO;
 
 import java.time.LocalDateTime;
 
-public class FlightDTO {
-    private Long flightId;
+public class FlightResponseDTO {
     private String flightNumber;
-    private String departureAirport;
-    private String arrivalAirport;
+    private String departure; // "Bangkok - Thailand"
+    private String arrival;   // "Kuala Lumpur - Malaysia"
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
     private String status;
     
-	public Long getFlightId() {
-		return flightId;
-	}
-	public void setFlightId(Long flightId) {
-		this.flightId = flightId;
-	}
 	public String getFlightNumber() {
 		return flightNumber;
 	}
+	
 	public void setFlightNumber(String flightNumber) {
 		this.flightNumber = flightNumber;
 	}
-	public String getDepartureAirport() {
-		return departureAirport;
+	
+	public String getDeparture() {
+		return departure;
 	}
-	public void setDepartureAirport(String departureAirport) {
-		this.departureAirport = departureAirport;
+	
+	public void setDeparture(String departure) {
+		this.departure = departure;
 	}
-	public String getArrivalAirport() {
-		return arrivalAirport;
+	
+	public String getArrival() {
+		return arrival;
 	}
-	public void setArrivalAirport(String arrivalAirport) {
-		this.arrivalAirport = arrivalAirport;
+	
+	public void setArrival(String arrival) {
+		this.arrival = arrival;
 	}
+	
 	public LocalDateTime getDepartureTime() {
 		return departureTime;
 	}
+	
 	public void setDepartureTime(LocalDateTime departureTime) {
 		this.departureTime = departureTime;
 	}
+	
 	public LocalDateTime getArrivalTime() {
 		return arrivalTime;
 	}
+	
 	public void setArrivalTime(LocalDateTime arrivalTime) {
 		this.arrivalTime = arrivalTime;
 	}
 	public String getStatus() {
 		return status;
 	}
+	
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
-    // getters và setters
-    
-    
 }
 

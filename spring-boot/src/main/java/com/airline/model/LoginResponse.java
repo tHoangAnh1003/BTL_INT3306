@@ -1,22 +1,30 @@
 package com.airline.model;
 
 public class LoginResponse {
-    private String token;
+    private String accessToken;
+    private String refreshToken;
     private String role;
-    
-    public LoginResponse() {} 
 
-    public LoginResponse(String token, String role) {
-        this.token = token;
+    public LoginResponse(String accessToken, String refreshToken, String role) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.role = role;
     }
 
-	public String getToken() {
-		return token;
+	public String getAccessToken() {
+		return accessToken;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
+
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
 	}
 
 	public String getRole() {
@@ -26,4 +34,8 @@ public class LoginResponse {
 	public void setRole(String role) {
 		this.role = role;
 	}
+    
+    
+
+    // Getters and setters
 }

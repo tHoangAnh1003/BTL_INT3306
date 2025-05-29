@@ -1,7 +1,7 @@
 package com.airline.service.impl;
 
 import com.airline.repository.PaymentRepository;
-import com.airline.repository.entity.PaymentEntity;
+import com.airline.entity.PaymentEntity;
 import com.airline.service.PaymentService;
 
 import java.util.List;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-	@Autowired
-    private PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
 
+    @Autowired
     public PaymentServiceImpl(PaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
     }
@@ -26,7 +26,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentEntity getPaymentById(Long id) {
-        return paymentRepository.findById(id);
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found with id: " + id));
     }
 
     @Override
@@ -36,11 +37,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void updatePayment(PaymentEntity payment) {
-        paymentRepository.update(payment);
+        paymentRepository.save(payment);
     }
 
     @Override
     public void deletePayment(Long id) {
-        paymentRepository.delete(id);
+        paymentRepository.deleteById(id);
     }
 }

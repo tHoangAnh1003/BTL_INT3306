@@ -2,20 +2,21 @@ package com.airline.DTO;
 
 import java.time.LocalDateTime;
 
-public class FlightDTO {
-    private Long flightId;
+public class FlightRequestDTO {
+    private Long airlineId;
     private String flightNumber;
-    private String departureAirport;
-    private String arrivalAirport;
+    private Long departureAirport;
+    private Long arrivalAirport;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
     private String status;
     
-	public Long getFlightId() {
-		return flightId;
+    
+	public Long getAirlineId() {
+		return airlineId;
 	}
-	public void setFlightId(Long flightId) {
-		this.flightId = flightId;
+	public void setAirlineId(Long airlineId) {
+		this.airlineId = airlineId;
 	}
 	public String getFlightNumber() {
 		return flightNumber;
@@ -23,16 +24,16 @@ public class FlightDTO {
 	public void setFlightNumber(String flightNumber) {
 		this.flightNumber = flightNumber;
 	}
-	public String getDepartureAirport() {
+	public Long getDepartureAirport() {
 		return departureAirport;
 	}
-	public void setDepartureAirport(String departureAirport) {
+	public void setDepartureAirport(Long departureAirport) {
 		this.departureAirport = departureAirport;
 	}
-	public String getArrivalAirport() {
+	public Long getArrivalAirport() {
 		return arrivalAirport;
 	}
-	public void setArrivalAirport(String arrivalAirport) {
+	public void setArrivalAirport(Long arrivalAirport) {
 		this.arrivalAirport = arrivalAirport;
 	}
 	public LocalDateTime getDepartureTime() {
@@ -53,9 +54,5 @@ public class FlightDTO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
-    // getters và setters
-    
-    
 }
 

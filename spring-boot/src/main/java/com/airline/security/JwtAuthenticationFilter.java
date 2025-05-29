@@ -1,16 +1,14 @@
 package com.airline.security;
 
+import com.airline.entity.UserEntity;
 import com.airline.repository.UserRepository;
-import com.airline.repository.entity.UserEntity;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter implements Filter {
@@ -34,9 +32,10 @@ public class JwtAuthenticationFilter implements Filter {
             String token = authHeader.substring(7);
             if (jwtUtil.isTokenValid(token)) {
                 Long userId = jwtUtil.getUserIdFromToken(token);
-                UserEntity user = userRepository.findById(userId);
-                if (user != null) {
-                    request.setAttribute(USER_ATTR, user); 
+                Optional<UserEntity> user = userRepository.findById(userId);
+                if (user.isPresent()) {
+                    // Gán UserEntity vào request attribute để controller/service lấy ra dùng
+                    request.setAttribute(USER_ATTR, user.get());
                 }
             }
         }
@@ -44,15 +43,13 @@ public class JwtAuthenticationFilter implements Filter {
         chain.doFilter(req, res);
     }
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Không cần thiết, để trống
+    }
 
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void destroy() {
+        // Không cần thiết, để trống
+    }
 }

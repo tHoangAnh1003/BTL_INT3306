@@ -2,27 +2,27 @@ package com.airline.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.airline.entity.BookingEntity;
+import com.airline.entity.FlightEntity;
 import com.airline.repository.BookingRepository;
-import com.airline.repository.entity.BookingEntity;
-import com.airline.repository.entity.FlightEntity;
 import com.airline.service.BookingService;
 import com.airline.service.FlightService;
 
 @Service
 public class BookingServiceImpl implements BookingService {
 
-	@Autowired
+    @Autowired
     private BookingRepository bookingRepository;
-	@Autowired
+
+    @Autowired
     private FlightService flightService;
 
-    public BookingServiceImpl(BookingRepository bookingRepository) {
-        this.bookingRepository = bookingRepository;
-    }
+    private static final long CANCEL_DEADLINE_HOURS = 24;
 
     @Override
     public List<BookingEntity> getAllBookings() {
@@ -31,7 +31,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingEntity getBookingById(Long id) {
-        return bookingRepository.findById(id);
+        return bookingRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -41,48 +41,45 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void updateBooking(BookingEntity booking) {
-        bookingRepository.update(booking);
+        bookingRepository.save(booking); // update when ID exists
     }
 
     @Override
     public void deleteBooking(Long id) {
-        bookingRepository.delete(id);
+        bookingRepository.deleteById(id);
     }
-    
+
     @Override
     public List<BookingEntity> getBookingsByPassengerId(Long passengerId) {
-        return bookingRepository.findByPassengerId(passengerId);
+        return bookingRepository.findByPassenger_Id(passengerId); 
     }
-    
-    private static final long CANCEL_DEADLINE_HOURS = 24;
 
     @Override
     public boolean canCancelBooking(Long bookingId) {
-        BookingEntity booking = bookingRepository.findById(bookingId);
-        if (booking == null) {
-            return false; 
-        }
-        FlightEntity flight = flightService.getFlightById(booking.getFlightId());
-        if (flight == null) {
-            return false;
-        }
+    	Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
+        if (!optionalBooking.isPresent()) return false;
+
+        BookingEntity booking = optionalBooking.get();
+        FlightEntity flight = flightService.getFlightById(booking.getFlight().getId());
+        if (flight == null) return false;
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime departureTime = flight.getDepartureTime();
 
         long hoursUntilDeparture = java.time.Duration.between(now, departureTime).toHours();
-
         return hoursUntilDeparture >= CANCEL_DEADLINE_HOURS && "Confirmed".equalsIgnoreCase(booking.getStatus());
     }
 
     @Override
     public boolean cancelBooking(Long bookingId) {
-        if (!canCancelBooking(bookingId)) {
-            return false;
-        }
-        BookingEntity booking = bookingRepository.findById(bookingId);
+        Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
+        if (!optionalBooking.isPresent()) return false;
+
+        BookingEntity booking = optionalBooking.get();
+        if (!canCancelBooking(bookingId)) return false;
+
         booking.setStatus("Cancelled");
-        bookingRepository.update(booking);
+        bookingRepository.save(booking);
         return true;
     }
 }
