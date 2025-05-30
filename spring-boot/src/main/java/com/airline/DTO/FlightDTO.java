@@ -3,7 +3,6 @@ package com.airline.DTO;
 import java.time.LocalDateTime;
 
 public class FlightDTO {
-    private Long flightId;
     private String flightNumber;
     private String departureAirport;
     private String arrivalAirport;
@@ -11,12 +10,7 @@ public class FlightDTO {
     private LocalDateTime arrivalTime;
     private String status;
     
-	public Long getFlightId() {
-		return flightId;
-	}
-	public void setFlightId(Long flightId) {
-		this.flightId = flightId;
-	}
+
 	public String getFlightNumber() {
 		return flightNumber;
 	}

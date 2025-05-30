@@ -50,12 +50,12 @@ public class FlightController {
 
     // 2. Get Flight by ID
     @GetMapping("/{id}")
-    public ResponseEntity<FlightDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         FlightEntity entity = flightService.getFlightById(id);
         if (entity == null) {
             return ResponseEntity.notFound().build();
         }
-        FlightDTO dto = flightConverter.toDTOR(entity);
+        FlightResponseDTO dto = flightConverter.toDTO(entity);
         return ResponseEntity.ok(dto);
     }
 
@@ -104,13 +104,21 @@ public class FlightController {
 
     // 6. Search Flights
     @GetMapping("/search")
-    public ResponseEntity<List<FlightDTO>> searchFlights(
+    public ResponseEntity<?> searchFlights(
             @RequestParam String departure,
             @RequestParam String arrival,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate
     ) {
         List<FlightEntity> flights = flightService.searchFlights(departure, arrival, departureDate);
-        return ResponseEntity.ok(flightConverter.toDTOList(flights));
+        
+        List<FlightResponseDTO> response = new ArrayList<>();
+
+        for (FlightEntity entity : flights) {
+            FlightResponseDTO dto = FlightConverter.toDTO(entity);
+            response.add(dto);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
 }

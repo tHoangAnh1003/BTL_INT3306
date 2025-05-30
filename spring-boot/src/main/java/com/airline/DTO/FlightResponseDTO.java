@@ -2,11 +2,16 @@ package com.airline.DTO;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class FlightResponseDTO {
     private String flightNumber;
     private String departure; // "Bangkok - Thailand"
     private String arrival;   // "Kuala Lumpur - Malaysia"
+    @JsonFormat(pattern = "dd MMM yyyy, HH:mm")  
     private LocalDateTime departureTime;
+
+    @JsonFormat(pattern = "dd MMM yyyy, HH:mm") 
     private LocalDateTime arrivalTime;
     private String status;
     
