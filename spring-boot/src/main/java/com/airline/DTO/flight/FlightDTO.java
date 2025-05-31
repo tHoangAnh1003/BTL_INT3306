@@ -1,4 +1,4 @@
-package com.airline.DTO;
+package com.airline.DTO.flight;
 
 import java.time.LocalDateTime;
 

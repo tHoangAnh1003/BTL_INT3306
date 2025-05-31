@@ -2,7 +2,7 @@
 
 import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
-import com.airline.DTO.BookingResponseDTO;
+import com.airline.DTO.booking.BookingResponseDTO;
 import com.airline.converter.BookingConverter;
 import com.airline.entity.BookingEntity;
 import com.airline.service.BookingService;

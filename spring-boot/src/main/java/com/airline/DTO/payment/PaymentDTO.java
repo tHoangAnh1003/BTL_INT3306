@@ -1,4 +1,4 @@
-package com.airline.DTO;
+package com.airline.DTO.payment;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

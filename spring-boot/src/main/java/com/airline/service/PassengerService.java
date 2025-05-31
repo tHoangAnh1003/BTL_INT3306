@@ -1,6 +1,6 @@
 package com.airline.service;
 
-import com.airline.DTO.PassengerDTO;
+import com.airline.DTO.passenger.PassengerDTO;
 import com.airline.entity.PassengerEntity;
 
 import java.util.List;

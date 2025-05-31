@@ -1,4 +1,4 @@
-package com.airline.DTO;
+package com.airline.DTO.passenger;
 
 public class PassengerDTO {
     private Long id;

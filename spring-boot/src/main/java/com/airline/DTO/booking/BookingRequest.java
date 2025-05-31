@@ -1,4 +1,4 @@
-package com.airline.DTO;
+package com.airline.DTO.booking;
 
 public class BookingRequest {
     private Long flightId;

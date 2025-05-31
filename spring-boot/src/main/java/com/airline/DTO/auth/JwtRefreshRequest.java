@@ -1,4 +1,4 @@
-package com.airline.DTO;
+package com.airline.DTO.auth;
 
 public class JwtRefreshRequest {
     public String refreshToken;

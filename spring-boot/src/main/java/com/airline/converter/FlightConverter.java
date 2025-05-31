@@ -1,7 +1,7 @@
 package com.airline.converter;
 
-import com.airline.DTO.FlightDTO;
-import com.airline.DTO.FlightResponseDTO;
+import com.airline.DTO.flight.FlightDTO;
+import com.airline.DTO.flight.FlightResponseDTO;
 import com.airline.entity.FlightEntity;
 import com.airline.entity.AirportEntity;
 import com.airline.entity.AirlineEntity;
@@ -84,7 +84,7 @@ public class FlightConverter {
 
         List<FlightDTO> dtoList = new ArrayList<>();
         for (FlightEntity entity : entities) {
-            FlightDTO dto = FlightConverter.toDTOR(entity); // hoặc toDTO tùy bạn đặt tên
+            FlightDTO dto = FlightConverter.toDTOR(entity); 
             dtoList.add(dto);
         }
 

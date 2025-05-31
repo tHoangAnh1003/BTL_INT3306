@@ -1,7 +1,7 @@
 package com.airline.api.controller;
 
-import com.airline.DTO.FlightDTO;
-import com.airline.DTO.FlightResponseDTO;
+import com.airline.DTO.flight.FlightDTO;
+import com.airline.DTO.flight.FlightResponseDTO;
 import com.airline.converter.FlightConverter;
 import com.airline.entity.FlightEntity;
 import com.airline.entity.UserEntity;

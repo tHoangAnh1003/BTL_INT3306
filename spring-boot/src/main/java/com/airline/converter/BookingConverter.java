@@ -1,7 +1,7 @@
 // BookingConverter.java
 package com.airline.converter;
 
-import com.airline.DTO.BookingResponseDTO;
+import com.airline.DTO.booking.BookingResponseDTO;
 import com.airline.entity.BookingEntity;
 
 public class BookingConverter {

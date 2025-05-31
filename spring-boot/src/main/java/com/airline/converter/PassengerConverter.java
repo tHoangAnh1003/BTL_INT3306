@@ -1,6 +1,6 @@
 package com.airline.converter;
 
-import com.airline.DTO.PassengerDTO;
+import com.airline.DTO.passenger.PassengerDTO;
 import com.airline.entity.PassengerEntity;
 import org.springframework.stereotype.Component;
 

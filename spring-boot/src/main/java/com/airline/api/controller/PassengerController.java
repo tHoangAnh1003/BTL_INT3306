@@ -1,6 +1,6 @@
 package com.airline.api.controller;
 
-import com.airline.DTO.PassengerDTO;
+import com.airline.DTO.passenger.PassengerDTO;
 import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.service.PassengerService;

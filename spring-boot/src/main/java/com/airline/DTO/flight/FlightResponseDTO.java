@@ -1,56 +1,63 @@
-package com.airline.DTO;
+package com.airline.DTO.flight;
 
 import java.time.LocalDateTime;
 
-public class FlightRequestDTO {
-    private Long airlineId;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+public class FlightResponseDTO {
     private String flightNumber;
-    private Long departureAirport;
-    private Long arrivalAirport;
+    private String departure; // "Bangkok - Thailand"
+    private String arrival;   // "Kuala Lumpur - Malaysia"
+    @JsonFormat(pattern = "dd MMM yyyy, HH:mm")  
     private LocalDateTime departureTime;
+
+    @JsonFormat(pattern = "dd MMM yyyy, HH:mm") 
     private LocalDateTime arrivalTime;
     private String status;
     
-    
-	public Long getAirlineId() {
-		return airlineId;
-	}
-	public void setAirlineId(Long airlineId) {
-		this.airlineId = airlineId;
-	}
 	public String getFlightNumber() {
 		return flightNumber;
 	}
+	
 	public void setFlightNumber(String flightNumber) {
 		this.flightNumber = flightNumber;
 	}
-	public Long getDepartureAirport() {
-		return departureAirport;
+	
+	public String getDeparture() {
+		return departure;
 	}
-	public void setDepartureAirport(Long departureAirport) {
-		this.departureAirport = departureAirport;
+	
+	public void setDeparture(String departure) {
+		this.departure = departure;
 	}
-	public Long getArrivalAirport() {
-		return arrivalAirport;
+	
+	public String getArrival() {
+		return arrival;
 	}
-	public void setArrivalAirport(Long arrivalAirport) {
-		this.arrivalAirport = arrivalAirport;
+	
+	public void setArrival(String arrival) {
+		this.arrival = arrival;
 	}
+	
 	public LocalDateTime getDepartureTime() {
 		return departureTime;
 	}
+	
 	public void setDepartureTime(LocalDateTime departureTime) {
 		this.departureTime = departureTime;
 	}
+	
 	public LocalDateTime getArrivalTime() {
 		return arrivalTime;
 	}
+	
 	public void setArrivalTime(LocalDateTime arrivalTime) {
 		this.arrivalTime = arrivalTime;
 	}
 	public String getStatus() {
 		return status;
 	}
+	
 	public void setStatus(String status) {
 		this.status = status;
 	}

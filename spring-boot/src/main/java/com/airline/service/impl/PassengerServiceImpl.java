@@ -1,7 +1,7 @@
 package com.airline.service.impl;
 
 import com.airline.repository.PassengerRepository;
-import com.airline.DTO.PassengerDTO;
+import com.airline.DTO.passenger.PassengerDTO;
 import com.airline.converter.PassengerConverter;
 import com.airline.entity.PassengerEntity;
 import com.airline.service.PassengerService;
