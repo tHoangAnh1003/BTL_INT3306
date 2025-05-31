@@ -1,10 +1,16 @@
  package com.airline.api.controller;
 
 import com.airline.entity.UserEntity;
+import com.airline.repository.FlightRepository;
+import com.airline.repository.FlightSeatRepository;
+import com.airline.repository.PassengerRepository;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.DTO.booking.BookingResponseDTO;
 import com.airline.converter.BookingConverter;
 import com.airline.entity.BookingEntity;
+import com.airline.entity.FlightEntity;
+import com.airline.entity.FlightSeatEntity;
+import com.airline.entity.PassengerEntity;
 import com.airline.service.BookingService;
 import com.airline.utils.AuthUtil;
 
@@ -28,7 +34,16 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+    
+    @Autowired 
+    private FlightRepository flightRepository;
 
+    @Autowired
+    private PassengerRepository passengerRepository;
+    
+    @Autowired
+    private FlightSeatRepository flightSeatRepository;
+    
     @GetMapping
     public ResponseEntity<List<BookingResponseDTO>> getAll(HttpServletRequest request) {
         UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
@@ -60,6 +75,20 @@ public class BookingController {
         }
 
         booking.setPassengerId(user.getId());
+
+        FlightEntity flight = flightRepository.findById(booking.getFlightId())
+                              .orElseThrow(() -> new RuntimeException("Flight không tồn tại"));
+
+        FlightSeatEntity seat = flightSeatRepository.findById(booking.getSeatId())
+                              .orElseThrow(() -> new RuntimeException("Seat không tồn tại"));
+
+        booking.setFlight(flight);
+        booking.setSeat(seat);
+        
+        PassengerEntity passenger = passengerRepository.findById(user.getId())
+                                   .orElseThrow(() -> new RuntimeException("Passenger không tồn tại"));
+        booking.setPassenger(passenger);
+
         bookingService.createBooking(booking);
 
         Map<String, Object> resp = new HashMap<>();
@@ -68,6 +97,7 @@ public class BookingController {
 
         return ResponseEntity.ok(resp);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<BookingEntity> updateBooking(HttpServletRequest request,

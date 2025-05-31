@@ -1,13 +1,11 @@
 package com.airline.api.controller;
 
-import com.airline.DTO.flight.FlightDTO;
 import com.airline.DTO.flight.FlightResponseDTO;
 import com.airline.converter.FlightConverter;
 import com.airline.entity.FlightEntity;
 import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.service.FlightService;
-import com.airline.service.UserService;
 import com.airline.utils.AuthUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/flights")
@@ -117,6 +116,32 @@ public class FlightController {
             FlightResponseDTO dto = FlightConverter.toDTO(entity);
             response.add(dto);
         }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search/round-trip")
+    public ResponseEntity<?> searchRoundTripFlights(
+            @RequestParam String departure,
+            @RequestParam String arrival,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate
+    ) {
+        List<FlightEntity> departureFlights = flightService.searchFlights(departure, arrival, departureDate);
+        List<FlightResponseDTO> departureResponses = new ArrayList<>();
+        for (FlightEntity entity : departureFlights) {
+            departureResponses.add(FlightConverter.toDTO(entity));
+        }
+
+        List<FlightEntity> returnFlights = flightService.searchFlights(arrival, departure, returnDate);
+        List<FlightResponseDTO> returnResponses = new ArrayList<>();
+        for (FlightEntity entity : returnFlights) {
+            returnResponses.add(FlightConverter.toDTO(entity));
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("departureFlights", departureResponses);
+        response.put("returnFlights", returnResponses);
 
         return ResponseEntity.ok(response);
     }

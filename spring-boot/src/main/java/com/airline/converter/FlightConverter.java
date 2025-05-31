@@ -6,6 +6,7 @@ import com.airline.entity.FlightEntity;
 import com.airline.entity.AirportEntity;
 import com.airline.entity.AirlineEntity;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FlightConverter {
+	
+//	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
 
     // Entity -> DTO
 	public static FlightResponseDTO toDTO(FlightEntity entity) {
@@ -78,6 +81,24 @@ public class FlightConverter {
 
         return entity;
     }
+    
+//    public static FlightEntity toEntityA(FlightRequestDTO dto, AirportRepository airportRepo) {
+//        FlightEntity flight = new FlightEntity();
+//        flight.setFlightNumber(dto.getFlightNumber());
+//        flight.setStatus(dto.getStatus());
+//        flight.setDepartureTime(LocalDateTime.parse(dto.getDepartureTime(), FORMATTER));
+//        flight.setArrivalTime(LocalDateTime.parse(dto.getArrivalTime(), FORMATTER));
+//
+//        AirportEntity departure = airportRepo.findByName(dto.getDeparture())
+//            .orElseThrow(() -> new RuntimeException("Departure airport not found: " + dto.getDeparture()));
+//        AirportEntity arrival = airportRepo.findByName(dto.getArrival())
+//            .orElseThrow(() -> new RuntimeException("Arrival airport not found: " + dto.getArrival()));
+//
+//        flight.setDepartureAirport(departure);
+//        flight.setArrivalAirport(arrival);
+//
+//        return flight;
+//    }
 
     public List<FlightDTO> toDTOList(List<FlightEntity> entities) {
         if (entities == null) return null;
