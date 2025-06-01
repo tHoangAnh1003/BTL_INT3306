@@ -3,6 +3,7 @@ package com.airline.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -43,6 +44,18 @@ public class FlightEntity {
 
     @Column(name = "status")
     private String status;
+    
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "aircraft_id")
+//    private AircraftEntity aircraft;
+//
+//    public AircraftEntity getAircraft() {
+//        return aircraft;
+//    }
+//
+//    public void setAircraft(AircraftEntity aircraft) {
+//        this.aircraft = aircraft;
+//    }
 
 	public Long getId() {
 		return id;

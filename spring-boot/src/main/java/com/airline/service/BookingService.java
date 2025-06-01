@@ -1,6 +1,8 @@
 package com.airline.service;
 
 import java.util.List;
+
+import com.airline.DTO.booking.BookingStatisticsDTO;
 import com.airline.entity.BookingEntity;
 
 public interface BookingService {
@@ -12,4 +14,5 @@ public interface BookingService {
     List<BookingEntity> getBookingsByPassengerId(Long passengerId);
     boolean canCancelBooking(Long bookingId);	
     boolean cancelBooking(Long bookingId);
+    List<BookingStatisticsDTO> getBookingStatistics();
 }
