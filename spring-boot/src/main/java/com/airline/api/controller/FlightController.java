@@ -1,5 +1,6 @@
 package com.airline.api.controller;
 
+import com.airline.DTO.flight.FlightDelayRequest;
 import com.airline.DTO.flight.FlightResponseDTO;
 import com.airline.converter.FlightConverter;
 import com.airline.entity.FlightEntity;
@@ -144,6 +145,24 @@ public class FlightController {
         response.put("returnFlights", returnResponses);
 
         return ResponseEntity.ok(response);
+    }
+    
+    @PutMapping("/{id}/delay")
+    public ResponseEntity<?> delayFlight(
+            HttpServletRequest request,
+            @PathVariable("id") Long flightId,
+            @RequestBody FlightDelayRequest dto
+    ) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Chỉ admin hoặc staff mới được phép delay chuyến bay");
+        }
+
+        flightService.delayFlight(flightId, dto.getNewDepartureTime(), dto.getNewArrivalTime());
+        return ResponseEntity.ok(
+                java.util.Collections.singletonMap("msg", "Cập nhật giờ khởi hành/thời gian đến thành công")
+        );
     }
 
 }

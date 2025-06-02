@@ -1,6 +1,8 @@
 package com.airline.service.impl;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -90,13 +92,23 @@ public class BookingServiceImpl implements BookingService {
         List<Object[]> rawStats = bookingRepository.getBookingStatisticsRaw();
         List<BookingStatisticsDTO> result = new ArrayList<>();
 
-        for (int i = 0; i < rawStats.size(); i++) {
-            Object[] row = rawStats.get(i);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+
+        for (Object[] row : rawStats) {
             BookingStatisticsDTO dto = new BookingStatisticsDTO();
 
             dto.setAircraftModel((String) row[1]);
             dto.setRoute((String) row[2]);
-            dto.setDepartureTime(row[3].toString()); // or format as needed
+
+            // Format departure time
+            if (row[3] instanceof Timestamp) {
+                Timestamp timestamp = (Timestamp) row[3];
+                LocalDateTime dateTime = timestamp.toLocalDateTime();
+                dto.setDepartureTime(dateTime.format(formatter));
+            } else {
+                dto.setDepartureTime(row[3].toString()); // fallback
+            }
+
             dto.setPassengerName((String) row[4]);
 
             result.add(dto);

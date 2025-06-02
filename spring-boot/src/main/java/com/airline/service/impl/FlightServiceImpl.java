@@ -6,6 +6,7 @@ import com.airline.service.FlightService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,6 +53,21 @@ public class FlightServiceImpl implements FlightService {
         LocalDateTime startOfDay = departureDate.atStartOfDay();
         LocalDateTime endOfDay = departureDate.plusDays(1).atStartOfDay();
         return flightRepository.searchFlightsByAirportNames(departure, arrival, startOfDay, endOfDay);
+    }
+    
+    @Override
+    @Transactional
+    public void delayFlight(Long flightId, LocalDateTime newDepTime, LocalDateTime newArrTime) {
+        Optional<FlightEntity> optionalFlight = flightRepository.findById(flightId);
+        if (!optionalFlight.isPresent()) {
+            throw new RuntimeException("Flight không tồn tại với id = " + flightId);
+        }
+        FlightEntity flight = optionalFlight.get();
+
+        flight.setDepartureTime(newDepTime);
+        flight.setArrivalTime(newArrTime);
+
+        flightRepository.save(flight);
     }
 
 }
