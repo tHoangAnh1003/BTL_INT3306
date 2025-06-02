@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AirportRepository extends JpaRepository<AirportEntity, Long> {
 
-    Long findIdByName(String name);
+    Long findAirportIdByName(String name);
 
     String findNameById(Long id);
 }

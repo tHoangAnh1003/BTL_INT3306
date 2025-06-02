@@ -8,6 +8,7 @@ import com.airline.entity.UserEntity;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByEmail(String email);
-    boolean existsByUsername(String username);
+    UserEntity findByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
 }

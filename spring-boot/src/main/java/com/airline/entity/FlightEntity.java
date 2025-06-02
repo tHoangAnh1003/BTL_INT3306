@@ -36,6 +36,18 @@ public class FlightEntity {
 
     @Column(name = "status")
     private String status;
+    
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "aircraft_id")
+//    private AircraftEntity aircraft;
+//
+//    public AircraftEntity getAircraft() {
+//        return aircraft;
+//    }
+//
+//    public void setAircraft(AircraftEntity aircraft) {
+//        this.aircraft = aircraft;
+//    }
 
 	public Long getId() {
 		return id;

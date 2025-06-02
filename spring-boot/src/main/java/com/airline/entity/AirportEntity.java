@@ -1,6 +1,7 @@
 package com.airline.entity;
 
 import jakarta.persistence.*;
+
 @Entity
 @Table(name = "airports")
 public class AirportEntity {

@@ -1,12 +1,14 @@
 package com.airline.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.airline.DTO.booking.BookingStatisticsDTO;
 import com.airline.entity.BookingEntity;
 import com.airline.entity.FlightEntity;
 import com.airline.repository.BookingRepository;
@@ -82,4 +84,25 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
         return true;
     }
+    
+    @Override
+    public List<BookingStatisticsDTO> getBookingStatistics() {
+        List<Object[]> rawStats = bookingRepository.getBookingStatisticsRaw();
+        List<BookingStatisticsDTO> result = new ArrayList<>();
+
+        for (int i = 0; i < rawStats.size(); i++) {
+            Object[] row = rawStats.get(i);
+            BookingStatisticsDTO dto = new BookingStatisticsDTO();
+
+            dto.setAircraftModel((String) row[1]);
+            dto.setRoute((String) row[2]);
+            dto.setDepartureTime(row[3].toString()); // or format as needed
+            dto.setPassengerName((String) row[4]);
+
+            result.add(dto);
+        }
+
+        return result;
+    }
+
 }

@@ -6,6 +6,7 @@ import com.airline.repository.FlightSeatRepository;
 import com.airline.repository.PassengerRepository;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.DTO.booking.BookingResponseDTO;
+import com.airline.DTO.booking.BookingStatisticsDTO;
 import com.airline.converter.BookingConverter;
 import com.airline.entity.BookingEntity;
 import com.airline.entity.FlightEntity;
@@ -153,5 +154,18 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Không thể hủy: đã quá hạn hoặc trạng thái không hợp lệ.");
     }
+    
+    @GetMapping("/statistics")
+    public ResponseEntity<List<BookingStatisticsDTO>> getBookingStatistics(HttpServletRequest request) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (!AuthUtil.isAdmin(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(null);
+        }
+
+        List<BookingStatisticsDTO> stats = bookingService.getBookingStatistics();
+        return ResponseEntity.ok(stats);
+    }
+
 }
 

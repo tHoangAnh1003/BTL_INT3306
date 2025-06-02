@@ -12,16 +12,27 @@ const LoginPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
+    console.log(form.email);
     e.preventDefault();
     try {
-      // Gọi API test quyền admin
-      const res = await fetch("http://localhost:8080/api/auth/admin-only", {
-        method: "GET",
+      const res = await fetch("http://localhost:8081/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
       });
       if (res.ok) {
+        const data = await res.json();
+        // Lưu token vào localStorage
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+        localStorage.setItem("role", data.role);
+        // Chuyển hướng sang dashboard
         navigate("/admin/dashboard");
       } else {
-        alert("Lỗi khi kiểm tra quyền admin!");
+        const error = await res.json();
+        alert(error.message || "Lỗi khi kiểm tra quyền admin!");
       }
     } catch (err) {
       alert("Lỗi khi kiểm tra quyền admin!");

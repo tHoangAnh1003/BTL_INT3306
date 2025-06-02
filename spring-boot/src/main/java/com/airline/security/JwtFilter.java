@@ -2,7 +2,12 @@ package com.airline.security;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
