@@ -135,6 +135,7 @@
       justify-content: center;
       gap: 1rem;
       margin-bottom: 1.5rem;
+      position: relative; // Đảm bảo .route-popup là absolute so với filter
 
       select,
       input {
@@ -156,6 +157,121 @@
         &:hover {
           background-color: #000;
           color: #fff;
+        }
+      }
+
+      .route-popup {
+        position: absolute;
+        left: 50%;
+        top: calc(100% + 8px);
+        transform: translateX(-50%);
+        background: #fff;
+        border: 1px solid #eee;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        padding: 20px 18px 12px 18px;
+        z-index: 20;
+        min-width: 370px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+
+        .route-inputs {
+          display: flex;
+          gap: 22px; // Tăng khoảng cách giữa hai ô input
+          margin-bottom: 8px;
+
+          > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafd;
+            border-radius: 8px;
+            padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 0;
+          }
+        }
+
+        label {
+          font-size: 0.97rem;
+          font-weight: 500;
+          color: #222;
+          margin-bottom: 4px;
+          margin-left: 2px;
+          display: block;
+        }
+
+        input {
+          width: 100%;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #d0d0d0;
+          border-radius: 6px;
+          font-size: 1rem;
+          margin-bottom: 0;
+          background: #fff;
+          transition: border 0.2s;
+          &:focus {
+            border: 1.5px solid #0071c2;
+            outline: none;
+            background: #f8fcff;
+          }
+        }
+
+        .suggestions {
+          background: #f8fafd;
+          border: 1px solid #e0e0e0;
+          border-radius: 6px;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          max-height: 120px;
+          overflow-y: auto;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+          li {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.97rem;
+            color: #222;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #f0f0f0;
+            &:last-child {
+              border-bottom: none;
+            }
+            &:hover {
+              background: #eaf6ff;
+              color: #0071c2;
+            }
+          }
+        }
+
+        .popup-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 18px;
+          margin-top: 10px;
+
+          button {
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #888;
+            padding: 0 6px;
+            transition: color 0.2s;
+            &:hover {
+              color: #0071c2;
+            }
+            &:last-child {
+              color: #0071c2;
+              font-weight: 700;
+            }
+          }
         }
       }
     }
@@ -280,38 +396,100 @@
   }
 }
 
-
 .services-grid,
 .news-grid,
-.guide-grid{
-  gap:1.5rem;
-  @include down(sm){ gap:1rem; }
+.guide-grid {
+  gap: 1.5rem;
+  @include down(sm) {
+    gap: 1rem;
+  }
 }
 
-.popular-flights{
+.popular-flights {
+  .flight-list {
+    display: grid;
+    gap: 1.5rem;
 
-  .flight-list{
-    display:grid;
-    gap:1.5rem;
-
-    @include down(sm){
-      .flight-card{
-        flex-direction:column;
-        img{ width:100%; height:auto; }
-        .flight-info{ text-align:center; }
+    @include down(sm) {
+      .flight-card {
+        flex-direction: column;
+        img {
+          width: 100%;
+          height: auto;
+        }
+        .flight-info {
+          text-align: center;
+        }
       }
     }
   }
 
-  .flight-filters{
-    display:flex;gap:1rem;
-    @include down(xs){
-      flex-direction:column;
-      button{ width:100%; }
+  .flight-filters {
+    display: flex;
+    gap: 1rem;
+    @include down(xs) {
+      flex-direction: column;
+      button {
+        width: 100%;
+      }
     }
   }
 }
 
-section{ padding:2rem 0;
-  @include down(xs){ padding:1.2rem 0; }
+section {
+  padding: 2rem 0;
+  @include down(xs) {
+    padding: 1.2rem 0;
+  }
+}
+
+.route-popup {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  z-index: 10;
+  width: 350px;
+  top: 60px;
+  left: 0;
+  border-radius: 8px;
+
+  .suggestions {
+    background: #fafafa;
+    border: 1px solid #eee;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 120px;
+    overflow-y: auto;
+
+    li {
+      padding: 6px 10px;
+      cursor: pointer;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+  }
+
+  .popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 12px;
+
+    button {
+      background: none;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      color: #888;
+
+      &:last-child {
+        color: #0071c2;
+      }
+    }
+  }
 }

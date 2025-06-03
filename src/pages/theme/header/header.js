@@ -1,44 +1,28 @@
-import { memo, useState } from "react";
-
-import airlineBackgound from "../../../assets/imgs/background.jpg";
-import airlineLogo from "../../../assets/imgs/logo-removebg-preview.png"; // Import logo image
-
-import "./header.scss"; // Import CSS file for styling
-
-import { ROUTERS } from "../../../utils/router-config";
+import { memo, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import airlineBackgound from "../../../assets/imgs/background.jpg";
+import airlineLogo from "../../../assets/imgs/logo-removebg-preview.png";
+
+import "./header.scss";
+import { ROUTERS } from "../../../utils/router-config";
+
 const Header = () => {
-
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  /** điều hướng + cuộn */
-  const handleNavClick = ({ path, sectionId }) => {
-    setIsMenuOpen(false);              // đóng burger menu
-    navigate(`/${path}`);              // điều hướng
-    const tryScroll = () => {
-      const el = sectionId && document.getElementById(sectionId);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      } else {
-        requestAnimationFrame(tryScroll); // chờ phần tử mount
-      }
-    };
-    requestAnimationFrame(tryScroll);
-  };
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State để quản lý menu
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); // Đổi trạng thái menu
-  };
+  
 
   const [menus] = useState([
     { name: "Trang chủ", path: ROUTERS.USER.HOME },
     { name: "Mua vé", path: ROUTERS.USER.BOOKING },
     { name: "Quản lý đặt chỗ", path: ROUTERS.USER.MANAGE },
-    { name: "Làm thủ tục", path: ROUTERS.USER.CHECK_IN },
+    { name: "Thông tin chuyến bay", path: ROUTERS.USER.FLIGHT_INFO },
   ]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <header
@@ -74,9 +58,6 @@ const Header = () => {
                 </Link>
               </li>
             ))}
-            <li>
-              <button className="complaint-button">Khiếu nại</button>
-            </li>
           </ul>
         </div>
       </div>
@@ -91,16 +72,12 @@ const Header = () => {
         <ul className="qairline-nav-menu">
           {menus.map((m, i) => (
             <li key={i}>
-              <button
-                className="qairline-nav-link"
-                onClick={() => handleNavClick(m)}
-              >
+              <Link to={m.path} className="qairline-nav-link">
                 {m.name}
-              </button>
+              </Link>
             </li>
           ))}
           <li>
-            <button className="complaint-button">Khiếu nại</button>
             <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">Đăng nhập</Link>
           </li>
         </ul>
@@ -116,7 +93,12 @@ const Header = () => {
           <br />
           Rồng mắc cạn cũng không ngang hàng với tép tôm.
         </p>
-        <button className="hero-cta-button">Khám phá các ưu đãi tốt nhất</button>
+        <button
+          className="hero-cta-button"
+          onClick={() => navigate("/tin-tuc", { state: { scrollToNews: true } })}
+        >
+          Khám phá các ưu đãi tốt nhất
+        </button>
       </div>
     </header>
   );

@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../Booking/booking.scss";
-//import API flight serice
+
 
 const tripTabs = [
   {
@@ -12,40 +13,46 @@ const tripTabs = [
 ]
 
 const BookingPage = () => {
-
-  useEffect(() => {
-    const el = document.getElementById("booking-section");
-    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
+  const navigate = useNavigate();
 
   const [tripType, setTripType] = useState("round");
   const [form, setForm] = useState({
-    from: "Hà Nội (HAN), Việt Nam",
+    from: "",
     to: "",
     departDate: "",
     returnDate: "",
     pax: 1,
     email: ""
   });
-  // const [flights, setFlights] = useState([]);
-  // const [selected, setSelected] = useState(null);
-  // const [msg, setMsg] = useState("");
 
-  /* ---------- handlers ---------- */
+  const [airports, setAirports] = useState([]);
+  const [loadingAirports, setLoadingAirports] = useState(true);
+
+  useEffect(() => {
+    // Lấy danh sách sân bay từ backend
+    const fetchAirports = async () => {
+      setLoadingAirports(true);
+      try {
+        const res = await fetch("http://localhost:8081/api/airports");
+        const data = await res.json();
+        setAirports(data);
+      } catch (err) {
+        setAirports([]);
+      }
+      setLoadingAirports(false);
+    };
+    fetchAirports();
+  }, []);
+
+  useEffect(() => {
+    const el = document.getElementById("booking-section");
+    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
   const onChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-
-  // const handleSearch = async () => {
-  //   const data = await searchFlights({ ...form, tripType });
-  //   setFlights(data);
-  //   setSelected(null);
-  //   setMsg("");
-  // };
-
-  // const handleBook = async () => {
-  //   if (!selected) return setMsg("Vui lòng chọn chuyến bay.");
-  //   const res = await createBooking({ flightId: selected.flight_id, ...form });
-  //   setMsg(res.message || "Đặt vé thành công!");
-  // };
+  const handleSearch = () => {
+    navigate("/ket-qua-chuyen-bay", { state: form });
+  };
 
   return (
     <div id="booking-section">
@@ -69,11 +76,35 @@ const BookingPage = () => {
       <form className="booking-form" onSubmit={e => e.preventDefault()}>
         <div>
           <label htmlFor="from">Từ</label>
-          <input id="from" name="from" value={form.from} onChange={onChange} placeholder="Từ" required />
+          <select
+            id="from"
+            name="from"
+            value={form.from}
+            onChange={onChange}
+            required
+            disabled={loadingAirports}
+          >
+            <option value="">Chọn điểm đi</option>
+            {airports.map(a => (
+              <option key={a.code || a.id} value={a.name}>{a.name}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label htmlFor="to">Đến</label>
-          <input id="to" name="to" value={form.to} onChange={onChange} placeholder="Đến" required />
+          <select
+            id="to"
+            name="to"
+            value={form.to}
+            onChange={onChange}
+            required
+            disabled={loadingAirports}
+          >
+            <option value="">Chọn điểm đến</option>
+            {airports.map(a => (
+              <option key={a.code || a.id} value={a.name}>{a.name}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label htmlFor="departDate">Ngày đi</label>
@@ -85,19 +116,10 @@ const BookingPage = () => {
             <input id="returnDate" type="date" name="returnDate" value={form.returnDate} onChange={onChange} required />
           </div>
         )}
-        <div>
-          <label htmlFor="pax">Hành khách</label>
-          <select id="pax" name="pax" value={form.pax} onChange={onChange}>
-            {[...Array(9)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input id="email" type="email" name="email" value={form.email} onChange={onChange} placeholder="example@gmail.com" required />
-        </div>
-        <button type="button">Tìm chuyến bay</button>
+        
+        <button type="button" onClick={handleSearch} disabled={loadingAirports}>
+          {loadingAirports ? "Đang tải..." : "Tìm chuyến bay"}
+        </button>
       </form>
 
       {/* Danh sách chuyến bay */}

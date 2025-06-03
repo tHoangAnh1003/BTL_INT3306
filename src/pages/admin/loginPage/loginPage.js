@@ -1,28 +1,55 @@
 import { memo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../../../assets/imgs/logo-removebg-preview.png"; // Import logo image
+import logo from "../../../assets/imgs/logo-removebg-preview.png";
 import { ROUTERS } from "../../../utils/router-config";
-import "./loginPage.scss"; // Import CSS file for styling
+import "./loginPage.scss";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Perform login logic here, e.g., API call
-    // If successful, navigate to the desired page
-    // navigate("/admin/dashboard"); // Example: redirect to dashboard after login
+    setError("");
+    try {
+      const res = await fetch("http://localhost:8081/api/auth/login", { // Sửa lại URL
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.message || "Đăng nhập thất bại");
+        return;
+      }
+      const data = await res.json();
+      // Lưu token vào localStorage/sessionStorage
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      if (data.username) {
+        localStorage.setItem("username", data.username);
+      }
+      // Điều hướng đến trang cho admin
+      navigate(ROUTERS.ADMIN.POST || "/admin/dashboard");
+    } catch (err) {
+      setError("Lỗi kết nối máy chủ");
+    }
   };
 
   return (
     <div className="login-wrapper">
       <header className="login-header">
-        <img src={logo} alt="logo" />
-        <h1>Q Airlines</h1>
+        <div
+          style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: 8 }}
+          onClick={() => navigate("/")}
+        >
+          <img src={logo} alt="logo" />
+          <h1 style={{ margin: 0 }}>Q Airlines</h1>
+        </div>
       </header>
 
       <form className="login-card" onSubmit={handleSubmit}>
@@ -50,6 +77,8 @@ const LoginPage = () => {
           required
         />
 
+        {error && <div className="login-error">{error}</div>}
+
         <button type="submit" className="btn-submit">
           Đăng nhập
         </button>
@@ -61,6 +90,6 @@ const LoginPage = () => {
       </form>
     </div>
   );
-}
+};
 
 export default memo(LoginPage);

@@ -7,9 +7,11 @@ import LoginPage from "./pages/admin/loginPage/loginPage";
 import SignupPage from "./pages/admin/signupPage/signupPage";
 import BookingPage from "./pages/users/Booking/booking";
 import ManageBookingPage from "./pages/users/ManageBookingPage/manageBooking";
-import CheckInPage from "./pages/users/CheckinPage/checkIn";
 import FlightInfoPage from "./pages/users/FlighInfomation/flightInfo";
 import PostPage from "./pages/admin/postPage/postPage";
+import FlightResultPage from "./pages/users/FlightResult/flightResult";
+import BookedPage from "./pages/users/BookedPage/bookedPage";
+import NewsPage from "./pages/users/NewsPage/newsPage";
 
 const renderUserRouter = () => {
   const userRouters = [
@@ -26,12 +28,20 @@ const renderUserRouter = () => {
       component: <ManageBookingPage />
     },
     {
-      path: ROUTERS.USER.CHECK_IN,
-      component: <CheckInPage />
+      path: ROUTERS.USER.FLIGHT_INFO,
+      component: <FlightInfoPage />
     },
     {
-      path: ROUTERS.USER.INFO,
-      component: <FlightInfoPage />
+      path: ROUTERS.USER.FLIGHT_RESULT,
+      component: <FlightResultPage />
+    },
+    {
+      path: ROUTERS.USER.BOOKED_FLIGHTS,
+      component: <BookedPage />
+    },
+    {
+      path: ROUTERS.USER.NEWS,
+      component: <NewsPage />
     }
   ];
   return (

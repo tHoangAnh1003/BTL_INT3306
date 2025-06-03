@@ -3,15 +3,26 @@ import "./flightInfo.scss";
 
 const FlightInfoPage = () => {
   const [flights, setFlights] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const fetchFlights = async () => {
-  //     const response = await fetch("/api/flights");
-  //     const data = await response.json();
-  //     setFlights(data);
-  //   };
-  //   fetchFlights();
-  // }, []);
+  useEffect(() => {
+    const el = document.getElementById("flight-info-section");
+    el && el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    // Lấy dữ liệu chuyến bay từ backend
+    const fetchFlights = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("http://localhost:8081/api/flights");
+        const data = await res.json();
+        setFlights(data);
+      } catch (err) {
+        setFlights([]);
+      }
+      setLoading(false);
+    };
+    fetchFlights();
+  }, []);
 
   return (
     <div id="flight-info-section">
@@ -27,18 +38,32 @@ const FlightInfoPage = () => {
             <th>Trạng thái</th>
           </tr>
         </thead>
-        {/* <tbody>
-          {flights.map((flight) => (
-            <tr key={flight.flight_id}>
-              <td>{flight.flight_number}</td>
-              <td>{flight.departure_airport}</td>
-              <td>{flight.arrival_airport}</td>
-              <td>{new Date(flight.departure_time).toLocaleString()}</td>
-              <td>{new Date(flight.arrival_time).toLocaleString()}</td>
-              <td>{flight.status}</td>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan={6} style={{ textAlign: "center" }}>
+                Đang tải dữ liệu...
+              </td>
             </tr>
-          ))}
-        </tbody> */}
+          ) : flights.length === 0 ? (
+            <tr>
+              <td colSpan={6} style={{ textAlign: "center" }}>
+                Không có chuyến bay nào
+              </td>
+            </tr>
+          ) : (
+            flights.map((f) => (
+              <tr key={f.id || f.flightNumber}>
+                <td>{f.flightNumber || f.id}</td>
+                <td>{f.from}</td>
+                <td>{f.to}</td>
+                <td>{f.departTime}</td>
+                <td>{f.arrivalTime}</td>
+                <td>{f.status}</td>
+              </tr>
+            ))
+          )}
+        </tbody>
       </table>
     </div>
   );

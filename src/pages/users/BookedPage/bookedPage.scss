@@ -1,0 +1,54 @@
+.booking-manage-wrapper {
+  padding: 2rem;
+  background: #fff;
+  min-height: 60vh;
+
+  h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #0071c2;
+    text-align: center;
+  }
+
+  .booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background: #f9f9f9;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+
+    th {
+      background: #0071c2;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f5faff;
+    }
+
+    tr:hover {
+      background: #e6f7ff;
+    }
+
+    button {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+      &:hover {
+        background: #b71c1c;
+      }
+    }
+  }
+}
