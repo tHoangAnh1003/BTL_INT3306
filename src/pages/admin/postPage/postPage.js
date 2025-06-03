@@ -1,54 +1,76 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./postPage.scss";
 
 const PostPage = () => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [category, setCategory] = useState("news");
+  const [form, setForm] = useState({
+    title: "",
+    type: "news",
+    content: "",
+  });
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log({ title, content, category });
-  //   // Gửi dữ liệu lên server hoặc xử lý logic tại đây
-  // };
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSuccess("");
+    setError("");
+    try {
+      const res = await fetch("http://localhost:8081/api/admin/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.message || "Lỗi khi đăng thông tin");
+        return;
+      }
+      setSuccess("Đăng thông tin thành công!");
+      setForm({ title: "", type: "news", content: "" });
+    } catch {
+      setError("Lỗi kết nối máy chủ");
+    }
+  };
 
   return (
     <div className="post-page">
-      <h1>Đăng Thông Tin</h1>
-      <form>
-        <div className="form-group">
-          <label htmlFor="title">Tiêu đề</label>
+      <h2>Đăng thông tin hãng</h2>
+      <form onSubmit={handleSubmit} className="post-form">
+        <label>
+          Tiêu đề:
           <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            name="title"
+            value={form.title}
+            onChange={handleChange}
             required
           />
-        </div>
-        <div className="form-group">
-          <label htmlFor="content">Nội dung</label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-          ></textarea>
-        </div>
-        <div className="form-group">
-          <label htmlFor="category">Danh mục</label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
+        </label>
+        <label>
+          Loại thông tin:
+          <select name="type" value={form.type} onChange={handleChange}>
             <option value="news">Tin tức</option>
             <option value="promotion">Khuyến mại</option>
             <option value="announcement">Thông báo</option>
             <option value="introduction">Giới thiệu</option>
           </select>
-        </div>
+        </label>
+        <label>
+          Nội dung:
+          <textarea
+            name="content"
+            value={form.content}
+            onChange={handleChange}
+            rows={6}
+            required
+          />
+        </label>
         <button type="submit">Đăng</button>
+        {success && <div className="success">{success}</div>}
+        {error && <div className="error">{error}</div>}
       </form>
     </div>
   );

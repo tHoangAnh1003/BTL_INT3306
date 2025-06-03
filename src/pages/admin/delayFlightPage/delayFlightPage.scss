@@ -1,4 +1,4 @@
-.post-page {
+.delay-flight-page {
   max-width: 500px;
   margin: 40px auto;
   background: #fff;
@@ -14,7 +14,7 @@
     font-weight: 700;
   }
 
-  .post-form {
+  .delay-form {
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -28,9 +28,8 @@
       margin-bottom: 6px;
     }
 
-    input,
     select,
-    textarea {
+    input {
       margin-top: 6px;
       padding: 10px 12px;
       border: 1px solid #ccc;
@@ -44,11 +43,6 @@
         outline: none;
         background: #fff;
       }
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
     }
 
     button[type="submit"] {

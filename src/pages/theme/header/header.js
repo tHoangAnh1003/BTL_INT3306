@@ -53,9 +53,23 @@ const Header = () => {
           <ul className="qairline-nav-menu">
             {menus?.map((menu, index) => (
               <li key={index}>
-                <Link to={menu.path} className="qairline-nav-link">
-                  {menu.name}
-                </Link>
+                {menu.name === "Trang chủ" ? (
+                  <Link
+                    to={menu.path}
+                    className="qairline-nav-link"
+                    onClick={e => {
+                      e.preventDefault();
+                      navigate("/");
+                      setTimeout(() => window.location.reload(), 0);
+                    }}
+                  >
+                    {menu.name}
+                  </Link>
+                ) : (
+                  <Link to={menu.path} className="qairline-nav-link">
+                    {menu.name}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
@@ -72,9 +86,23 @@ const Header = () => {
         <ul className="qairline-nav-menu">
           {menus.map((m, i) => (
             <li key={i}>
-              <Link to={m.path} className="qairline-nav-link">
-                {m.name}
-              </Link>
+              {m.name === "Trang chủ" ? (
+                <Link
+                  to={m.path}
+                  className="qairline-nav-link"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate("/");
+                    setTimeout(() => window.location.reload(), 0);
+                  }}
+                >
+                  {m.name}
+                </Link>
+              ) : (
+                <Link to={m.path} className="qairline-nav-link">
+                  {m.name}
+                </Link>
+              )}
             </li>
           ))}
           <li>

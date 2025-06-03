@@ -1,4 +1,4 @@
-.post-page {
+.flight-page {
   max-width: 500px;
   margin: 40px auto;
   background: #fff;
@@ -14,7 +14,7 @@
     font-weight: 700;
   }
 
-  .post-form {
+  .flight-form {
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -29,7 +29,6 @@
     }
 
     input,
-    select,
     textarea {
       margin-top: 6px;
       padding: 10px 12px;
@@ -47,7 +46,7 @@
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 60px;
       resize: vertical;
     }
 

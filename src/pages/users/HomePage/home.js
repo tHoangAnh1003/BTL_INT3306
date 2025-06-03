@@ -1,4 +1,5 @@
 import { memo, useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 // import images for the services and news sections
 import imgService1 from "../../../assets/imgs/hanh-ly-removebg-preview.png";
@@ -22,90 +23,42 @@ import guide6 from "../../../assets/imgs/gap-van-de-voi-hanh-ly.jpg";
 import "./home.scss"; // Import CSS file for styling
 import NewsSlider from "../../../components/slider";
 
-// Giả lập danh sách sân bay (bạn nên fetch từ API thực tế)
-
+// Giả lập danh sách sân bay
 
 const HomePage = () => {
   const [airports, setAirports] = useState([]);
   const [filters, setFilters] = useState({ route: "", budget: "" });
   const [flights] = useState([
-    { id: 1, route: "Hà Nội đến TP. Hồ Chí Minh", date: "14/04/2025", price: 10.99, img: flightImg1 },
-    { id: 2, route: "TP.Hồ Chí Minh đến Hà Nội", date: "21/04/2025", price: 10.99, img: flightImg2 },
-    { id: 3, route: "Hà Nội đến Đà Nẵng", date: "25/04/2025", price: 15.99, img: flightImg1 },
-    { id: 4, route: "Đà Nẵng đến Hà Nội", date: "28/04/2025", price: 12.99, img: flightImg2 },
+    { id: 1, route: "Hà Nội đến TP. Hồ Chí Minh", price: 1200000, img: flightImg1 },
+    { id: 2, route: "TP.Hồ Chí Minh đến Hà Nội", price: 1099000, img: flightImg2 },
+    { id: 3, route: "Hà Nội đến Đà Nẵng", price: 1599000, img: flightImg1 },
+    { id: 4, route: "Đà Nẵng đến Hà Nội", price: 1299000, img: flightImg2 },
   ]);
-  const [showRoutePopup, setShowRoutePopup] = useState(false);
-  const [routeInput, setRouteInput] = useState({ from: "", to: "" });
-  const [suggestions, setSuggestions] = useState({ from: [], to: [] });
-  const popupRef = useRef();
-  const btnRef = useRef();
+  const [budgetInput, setBudgetInput] = useState("");
+  const navigate = useNavigate();
+
+  // Lấy danh sách tuyến đường duy nhất từ flights
+  const routeOptions = Array.from(new Set(flights.map(f => f.route)));
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleBudgetChange = (e) => {
+    let raw = e.target.value.replace(/[^0-9]/g, "");
+    setFilters((prev) => ({ ...prev, budget: raw }));
+    if (raw) {
+      setBudgetInput(Number(raw).toLocaleString("vi-VN"));
+    } else {
+      setBudgetInput("");
+    }
+  };
+
   const filteredFlights = flights.filter((flight) => {
-    const matchesRoute = filters.route ? flight.route.includes(filters.route) : true;
+    const matchesRoute = filters.route ? flight.route === filters.route : true;
     const matchesBudget = filters.budget ? flight.price <= parseFloat(filters.budget) : true;
     return matchesRoute && matchesBudget;
   });
-
-  // Fetch airports when popup opens
-  useEffect(() => {
-    if (showRoutePopup && airports.length === 0) {
-      fetch("/api/airports")
-        .then(res => res.json())
-        .then(data => setAirports(data));
-    }
-  }, [showRoutePopup, airports.length]);
-
-  // Đóng popup khi click ra ngoài
-  useEffect(() => {
-    if (!showRoutePopup) return;
-    const handleClick = (e) => {
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(e.target) &&
-        btnRef.current &&
-        !btnRef.current.contains(e.target)
-      ) {
-        setShowRoutePopup(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [showRoutePopup]);
-
-  // Gợi ý sân bay khi nhập
-  const handleAirportInput = (field, value) => {
-    setRouteInput((prev) => ({ ...prev, [field]: value }));
-    setSuggestions((prev) => ({
-      ...prev,
-      [field]: airports.filter((a) =>
-        a.name.toLowerCase().includes(value.toLowerCase()) ||
-        a.code.toLowerCase().includes(value.toLowerCase()) ||
-        (a.city && a.city.toLowerCase().includes(value.toLowerCase()))
-      )
-    }));
-  };
-
-  // Áp dụng filter
-  const handleApplyRoute = () => {
-    setFilters({
-      ...filters,
-      route: routeInput.from && routeInput.to
-        ? `${routeInput.from} đến ${routeInput.to}`
-        : ""
-    });
-    setShowRoutePopup(false);
-  };
-
-  // Đặt lại filter
-  const handleResetRoute = () => {
-    setRouteInput({ from: "", to: "" });
-    setFilters({ ...filters, route: "" });
-    setShowRoutePopup(false);
-  };
 
   return (
     <div className="homepage-container">
@@ -154,79 +107,57 @@ const HomePage = () => {
       <section className="popular-flights">
         <h2>Khám Phá Các Chuyến Bay Phổ Biến Nhất Của Chúng Tôi</h2>
         <div className="flight-filters" style={{ position: "relative" }}>
-          <button
-            type="button"
-            ref={btnRef}
-            onClick={() => setShowRoutePopup((v) => !v)}
-            style={{ minWidth: 150 }}
-            id="route-btn"
+          <select
+            value={filters.route}
+            onChange={e => handleFilterChange("route", e.target.value)}
+            style={{ minWidth: 180, marginRight: 12 }}
           >
-            {filters.route ? filters.route : "Chọn tuyến đường"}
-          </button>
+            <option value="">Chọn tuyến đường</option>
+            {routeOptions.map(route => (
+              <option key={route} value={route}>{route}</option>
+            ))}
+          </select>
           <input
-            type="number"
-            value={filters.budget}
-            placeholder="Ngân sách (USD)"
-            onChange={(e) => handleFilterChange("budget", e.target.value)}
+            type="text"
+            value={budgetInput}
+            placeholder="Ngân sách (VND)"
+            onChange={handleBudgetChange}
+            inputMode="numeric"
+            min={0}
           />
-          <button onClick={() => setFilters({ route: "", budget: "" })}>XÓA</button>
-
-          {/* Popup chọn tuyến đường */}
-          {showRoutePopup && (
-            <div className="route-popup" ref={popupRef}>
-              <div className="route-inputs">
-                <div>
-                  <label>Từ</label>
-                  <input
-                    value={routeInput.from}
-                    onChange={e => handleAirportInput("from", e.target.value)}
-                    placeholder="Nhập điểm đi"
-                    autoFocus
-                  />
-                  {routeInput.from && (
-                    <ul className="suggestions">
-                      {suggestions.from.map(a => (
-                        <li key={a.code} onClick={() => setRouteInput(r => ({ ...r, from: a.name }))}>
-                          <span role="img" aria-label="location">📍</span> {a.name}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div>
-                  <label>Đến</label>
-                  <input
-                    value={routeInput.to}
-                    onChange={e => handleAirportInput("to", e.target.value)}
-                    placeholder="Nhập điểm đến"
-                  />
-                  {routeInput.to && (
-                    <ul className="suggestions">
-                      {suggestions.to.map(a => (
-                        <li key={a.code} onClick={() => setRouteInput(r => ({ ...r, to: a.name }))}>
-                          <span role="img" aria-label="location">📍</span> {a.name}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-              <div className="popup-actions">
-                <button type="button" onClick={handleResetRoute}>ĐẶT LẠI</button>
-                <button type="button" onClick={handleApplyRoute} style={{ color: "#0071c2" }}>ÁP DỤNG</button>
-              </div>
-            </div>
-          )}
+          <button
+            onClick={() => {
+              setFilters((prev) => ({ ...prev, budget: "" }));
+              setBudgetInput("");
+            }}
+          >
+            XÓA
+          </button>
         </div>
 
         <div className="flight-list">
           {filteredFlights.map((flight) => (
-            <div className="flight-card" key={flight.id}>
+            <div
+              className="flight-card"
+              key={flight.id}
+              style={{ cursor: "pointer" }}
+              onClick={() =>
+                navigate("/ket-qua-chuyen-bay", {
+                  state: {
+                    route: flight.route,
+                    price: flight.price,
+                    // tách điểm đi/đến:
+                    departure: flight.route.split(" đến ")[0],
+                    arrival: flight.route.split(" đến ")[1],
+                  },
+                })
+              }
+            >
               <img src={flight.img} alt={flight.route} />
               <div className="flight-info">
                 <h3>{flight.route}</h3>
                 <p>{flight.date}</p>
-                <p>${flight.price.toFixed(2)}</p>
+                <p>{flight.price.toLocaleString("vi-VN")} ₫</p>
               </div>
             </div>
           ))}

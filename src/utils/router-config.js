@@ -1,3 +1,5 @@
+import AircraftPage from "../pages/admin/aircraftPage/aircraftPage";
+
 export const ADMIN_PATH = "/admin";
 
 export const ROUTERS = {
@@ -16,5 +18,9 @@ export const ROUTERS = {
     LOGIN: `${ADMIN_PATH}/dang-nhap`,
     REGISTER: `${ADMIN_PATH}/dang-ky`,
     POST: `${ADMIN_PATH}/dang-thong-tin`,
+    AIRCRAFT: `${ADMIN_PATH}/quan-ly-tau-bay`,
+    FLIGHTS: `${ADMIN_PATH}/quan-ly-chuyen-bay`,
+    STATISTICS: `${ADMIN_PATH}/thong-ke-dat-ve`,
+    DELAY: `${ADMIN_PATH}/thay-doi-gio-bay`,
   },
 }

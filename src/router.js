@@ -12,6 +12,11 @@ import PostPage from "./pages/admin/postPage/postPage";
 import FlightResultPage from "./pages/users/FlightResult/flightResult";
 import BookedPage from "./pages/users/BookedPage/bookedPage";
 import NewsPage from "./pages/users/NewsPage/newsPage";
+import AircraftPage from "./pages/admin/aircraftPage/aircraftPage";
+import FlightPage from "./pages/admin/flightPage/flightPage";
+import BookingStatsPage from "./pages/admin/bookingStatsPage/bookingStatsPage";
+import DelayFlightPage from "./pages/admin/delayFlightPage/delayFlightPage";
+
 
 const renderUserRouter = () => {
   const userRouters = [
@@ -70,6 +75,22 @@ const renderAdminRouter = () => {
     {
       path: ROUTERS.ADMIN.POST,
       component: <PostPage />
+    },
+    {
+      path: ROUTERS.ADMIN.AIRCRAFT,
+      component: <AircraftPage />
+    },
+    {
+      path: ROUTERS.ADMIN.FLIGHTS,
+      component: <FlightPage />
+    },
+    {
+      path: ROUTERS.ADMIN.STATISTICS,
+      component: <BookingStatsPage />
+    },
+    {
+      path: ROUTERS.ADMIN.DELAY,
+      component: <DelayFlightPage />
     }
   ];
   return (
