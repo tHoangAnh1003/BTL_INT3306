@@ -10,8 +10,14 @@ import { ROUTERS } from "../../../utils/router-config";
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [username, setUsername] = useState(localStorage.getItem("username") || "");
 
-  
+  useEffect(() => {
+    // Lắng nghe sự thay đổi của localStorage (nếu có logout ở nơi khác)
+    const handleStorage = () => setUsername(localStorage.getItem("username") || "");
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const [menus] = useState([
     { name: "Trang chủ", path: ROUTERS.USER.HOME },
@@ -23,6 +29,13 @@ const Header = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData && userData.username) {
+      localStorage.setItem("username", userData.username);
+    }
+  }, []);
 
   return (
     <header
@@ -45,9 +58,13 @@ const Header = () => {
           <h1>Q Airlines</h1>
         </div>
         <div className="burger-menu-login">
-          <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
-            Đăng nhập
-          </Link>
+          {username ? (
+            <span className="login-button">{username}</span>
+          ) : (
+            <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
+              Đăng nhập
+            </Link>
+          )}
         </div>
         <div className="burger-nav-menu">
           <ul className="qairline-nav-menu">
@@ -106,7 +123,13 @@ const Header = () => {
             </li>
           ))}
           <li>
-            <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">Đăng nhập</Link>
+            {username ? (
+              <span className="login-button">{username}</span>
+            ) : (
+              <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
+                Đăng nhập
+              </Link>
+            )}
           </li>
         </ul>
       </nav>

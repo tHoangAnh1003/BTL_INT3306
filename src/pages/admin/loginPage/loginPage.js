@@ -16,7 +16,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("http://localhost:8081/api/auth/login", { // Sửa lại URL
+      const res = await fetch("http://localhost:8081/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -33,8 +33,11 @@ const LoginPage = () => {
       if (data.username) {
         localStorage.setItem("username", data.username);
       }
-      // Điều hướng đến trang cho admin
-      navigate(ROUTERS.ADMIN.POST || "/admin/dashboard");
+      if (data.role === "ADMIN") {
+        navigate(ROUTERS.ADMIN.POST || "/admin/post");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError("Lỗi kết nối máy chủ");
     }
