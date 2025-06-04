@@ -1,12 +1,15 @@
  package com.airline.api.controller;
 
 import com.airline.entity.UserEntity;
+import com.airline.repository.BookingRepository;
 import com.airline.repository.FlightRepository;
 import com.airline.repository.FlightSeatRepository;
 import com.airline.repository.PassengerRepository;
 import com.airline.security.JwtAuthenticationFilter;
+import com.airline.DTO.booking.BookingRequestDTO;
 import com.airline.DTO.booking.BookingResponseDTO;
 import com.airline.DTO.booking.BookingStatisticsDTO;
+import com.airline.DTO.booking.BookingSummaryDTO;
 import com.airline.converter.BookingConverter;
 import com.airline.entity.BookingEntity;
 import com.airline.entity.FlightEntity;
@@ -21,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +50,9 @@ public class BookingController {
     @Autowired
     private FlightSeatRepository flightSeatRepository;
     
+    @Autowired
+    private BookingRepository bookingRepository;
+    
     @GetMapping
     public ResponseEntity<List<BookingResponseDTO>> getAll(HttpServletRequest request) {
         UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
@@ -63,11 +71,10 @@ public class BookingController {
         BookingEntity booking = bookingService.getBookingById(id);
         return ResponseEntity.ok(BookingConverter.toDTO(booking));
     }
-
-
+    
     @PostMapping
     public ResponseEntity<Map<String, Object>> createBooking(HttpServletRequest request,
-                                                             @RequestBody BookingEntity booking) {
+                                                             @RequestBody BookingRequestDTO bookingRequest) {
         UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
 
         if (!AuthUtil.isCustomer(user)) {
@@ -75,20 +82,25 @@ public class BookingController {
                     .body(Collections.singletonMap("msg", "Chỉ khách hàng mới được đặt vé"));
         }
 
-        booking.setPassengerId(user.getId());
+        List<FlightEntity> flights = flightRepository.findByAircraftModel(bookingRequest.getAircraftModel());
+        if (flights.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy chuyến bay với máy bay: " + bookingRequest.getAircraftModel());
+        }
 
-        FlightEntity flight = flightRepository.findById(booking.getFlightId())
-                              .orElseThrow(() -> new RuntimeException("Flight không tồn tại"));
+        FlightEntity flight = flights.get(0);
 
-        FlightSeatEntity seat = flightSeatRepository.findById(booking.getSeatId())
-                              .orElseThrow(() -> new RuntimeException("Seat không tồn tại"));
+        FlightSeatEntity seat = flightSeatRepository.findById(bookingRequest.getSeatId())
+                .orElseThrow(() -> new RuntimeException("Seat không tồn tại"));
 
+        PassengerEntity passenger = passengerRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("Passenger không tồn tại"));
+
+        BookingEntity booking = new BookingEntity();
+        booking.setPassenger(passenger);
         booking.setFlight(flight);
         booking.setSeat(seat);
-        
-        PassengerEntity passenger = passengerRepository.findById(user.getId())
-                                   .orElseThrow(() -> new RuntimeException("Passenger không tồn tại"));
-        booking.setPassenger(passenger);
+        booking.setStatus(bookingRequest.getStatus());
+        booking.setBookingDate(LocalDateTime.now());
 
         bookingService.createBooking(booking);
 
@@ -98,6 +110,7 @@ public class BookingController {
 
         return ResponseEntity.ok(resp);
     }
+
 
 
     @PutMapping("/{id}")
@@ -166,6 +179,26 @@ public class BookingController {
         List<BookingStatisticsDTO> stats = bookingService.getBookingStatistics();
         return ResponseEntity.ok(stats);
     }
+    
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyBookings(HttpServletRequest request) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+
+        if (!AuthUtil.isCustomer(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Collections.singletonMap("msg", "Chỉ khách hàng mới được xem danh sách vé đã đặt"));
+        }
+
+        List<BookingEntity> bookings = bookingRepository.findByPassenger_Id(user.getId());
+        List<BookingSummaryDTO> response = new ArrayList<>();
+
+        for (BookingEntity booking : bookings) {
+            response.add(BookingConverter.toSummaryDTO(booking));
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }
 

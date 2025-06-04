@@ -3,6 +3,7 @@ package com.airline.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,10 +15,12 @@ import com.airline.service.UserService;
 public class UserServiceImpl implements UserService {
     
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     
     @Override
@@ -33,13 +36,20 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void save(UserEntity user) {
+        String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
+        user.setPasswordHash(hashedPassword);
+
+        if (user.getRole() == null || user.getRole().trim().isEmpty()) {
+            user.setRole("Customer");
+        }
+
         userRepository.save(user);
     }
 
     @Override
     @Transactional
     public void registerUser(UserEntity user) {
-        userRepository.save(user);
+        save(user);
     }
     
     @Override

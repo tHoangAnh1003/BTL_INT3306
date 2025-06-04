@@ -1,29 +1,32 @@
 package com.airline.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "passengers")
-public class PassengerEntity {
+public class PassengerEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "passenger_id")
     private Long id;
 
-    @Column(name = "full_name", nullable = false)
+    @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "phone")
+    @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "passport_number", unique = true)
+    @Column(name = "passport_number", unique = true, length = 50)
     private String passportNumber;
 
-    // Constructors
     public PassengerEntity() {
     }
 
@@ -35,7 +38,7 @@ public class PassengerEntity {
         this.passportNumber = passportNumber;
     }
 
-    // Getters and setters
+    // Getters & setters
     public Long getId() {
         return id;
     }
@@ -74,6 +77,19 @@ public class PassengerEntity {
 
     public void setPassportNumber(String passportNumber) {
         this.passportNumber = passportNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PassengerEntity)) return false;
+        PassengerEntity that = (PassengerEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

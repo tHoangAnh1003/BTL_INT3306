@@ -1,10 +1,15 @@
 package com.airline.api.controller;
 
+import com.airline.DTO.flight.FlightCreateRequest;
 import com.airline.DTO.flight.FlightDelayRequest;
 import com.airline.DTO.flight.FlightResponseDTO;
 import com.airline.converter.FlightConverter;
+import com.airline.entity.AirlineEntity;
+import com.airline.entity.AirportEntity;
 import com.airline.entity.FlightEntity;
 import com.airline.entity.UserEntity;
+import com.airline.repository.AirlineRepository;
+import com.airline.repository.AirportRepository;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.service.FlightService;
 import com.airline.utils.AuthUtil;
@@ -18,10 +23,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/flights")
@@ -32,7 +40,12 @@ public class FlightController {
 
     @Autowired
     private FlightConverter flightConverter;
+    
+    @Autowired
+    private AirportRepository airportRepository;
 
+    @Autowired
+    private AirlineRepository airlineRepository;
     // 1. Get All Flights
     @GetMapping
     public ResponseEntity<?> getAllFlights() {
@@ -61,17 +74,56 @@ public class FlightController {
 
 
     // 3. Create Flight
+//    @PostMapping
+//    public ResponseEntity<?> create(HttpServletRequest request, @RequestBody FlightEntity flight) {
+//        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+//
+//        if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin hoặc staff mới được thêm chuyến bay");
+//        }
+//
+//        flightService.createFlight(flight);
+//        return ResponseEntity.status(HttpStatus.CREATED).build();
+//    }
+    
     @PostMapping
-    public ResponseEntity<?> create(HttpServletRequest request, @RequestBody FlightEntity flight) {
+    public ResponseEntity<?> create(HttpServletRequest request, @RequestBody FlightCreateRequest dto) {
         UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
 
         if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin hoặc staff mới được thêm chuyến bay");
         }
 
+        AirlineEntity airline = airlineRepository.findByName(dto.getAirline());
+        if (airline == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hãng bay không tồn tại");
+        }
+
+        Optional<AirportEntity> depAirportOpt = airportRepository.findByCity(dto.getDepartureAirport());
+        AirportEntity departureAirport = depAirportOpt.orElseThrow(() ->
+            new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sân bay đi không tồn tại"));
+
+        Optional<AirportEntity> arrAirportOpt = airportRepository.findByCity(dto.getArrivalAirport());
+        AirportEntity arrivalAirport = arrAirportOpt.orElseThrow(() ->
+            new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sân bay đến không tồn tại"));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm");
+        LocalDateTime departureTime = LocalDateTime.parse(dto.getDepartureTime(), formatter);
+        LocalDateTime arrivalTime = LocalDateTime.parse(dto.getArrivalTime(), formatter);
+
+        FlightEntity flight = new FlightEntity();
+        flight.setAirline(airline);
+        flight.setFlightNumber(dto.getFlightNumber());
+        flight.setDepartureAirport(departureAirport);
+        flight.setArrivalAirport(arrivalAirport);
+        flight.setDepartureTime(departureTime);
+        flight.setArrivalTime(arrivalTime);
+        flight.setStatus(dto.getStatus());
+
         flightService.createFlight(flight);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 
     // 4. Update Flight
     @PutMapping("/{id}")
@@ -102,25 +154,30 @@ public class FlightController {
         return ResponseEntity.noContent().build();
     }
 
-    // 6. Search Flights
+    // 6. Search Flights    
     @GetMapping("/search")
     public ResponseEntity<?> searchFlights(
             @RequestParam String departure,
             @RequestParam String arrival,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate
     ) {
-        List<FlightEntity> flights = flightService.searchFlights(departure, arrival, departureDate);
-        
-        List<FlightResponseDTO> response = new ArrayList<>();
+        AirportEntity departureAirport = airportRepository.findByCity(departure)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid departure city"));
+        AirportEntity arrivalAirport = airportRepository.findByCity(arrival)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid arrival city"));
 
+        List<FlightEntity> flights = flightService.searchFlights(
+                departureAirport.getCode(), arrivalAirport.getCode(), departureDate);
+
+        List<FlightResponseDTO> response = new ArrayList<>();
         for (FlightEntity entity : flights) {
-            FlightResponseDTO dto = FlightConverter.toDTO(entity);
-            response.add(dto);
+            response.add(FlightConverter.toDTO(entity));
         }
 
         return ResponseEntity.ok(response);
     }
 
+    
     @GetMapping("/search/round-trip")
     public ResponseEntity<?> searchRoundTripFlights(
             @RequestParam String departure,
@@ -128,13 +185,20 @@ public class FlightController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate
     ) {
-        List<FlightEntity> departureFlights = flightService.searchFlights(departure, arrival, departureDate);
+        AirportEntity departureAirport = airportRepository.findByCity(departure)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid departure city"));
+        AirportEntity arrivalAirport = airportRepository.findByCity(arrival)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid arrival city"));
+
+        List<FlightEntity> departureFlights = flightService.searchFlights(
+                departureAirport.getCode(), arrivalAirport.getCode(), departureDate);
         List<FlightResponseDTO> departureResponses = new ArrayList<>();
         for (FlightEntity entity : departureFlights) {
             departureResponses.add(FlightConverter.toDTO(entity));
         }
 
-        List<FlightEntity> returnFlights = flightService.searchFlights(arrival, departure, returnDate);
+        List<FlightEntity> returnFlights = flightService.searchFlights(
+                arrivalAirport.getCode(), departureAirport.getCode(), returnDate);
         List<FlightResponseDTO> returnResponses = new ArrayList<>();
         for (FlightEntity entity : returnFlights) {
             returnResponses.add(FlightConverter.toDTO(entity));
@@ -146,6 +210,7 @@ public class FlightController {
 
         return ResponseEntity.ok(response);
     }
+
     
     @PutMapping("/{id}/delay")
     public ResponseEntity<?> delayFlight(

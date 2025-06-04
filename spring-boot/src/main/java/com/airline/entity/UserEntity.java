@@ -13,13 +13,13 @@ public class UserEntity {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "password_hash")
+    @Column(name = "password_hash") // 123456
     private String passwordHash;
 
     @Column(name = "email")
     private String email;
 
-    @Column(name = "role")
+    @Column(name = "role") // Customer, Staff
     private String role;
 
 	public Long getId() {

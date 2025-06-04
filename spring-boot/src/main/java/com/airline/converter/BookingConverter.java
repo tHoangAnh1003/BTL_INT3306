@@ -1,8 +1,13 @@
 // BookingConverter.java
 package com.airline.converter;
 
+import java.time.format.DateTimeFormatter;
+
 import com.airline.DTO.booking.BookingResponseDTO;
+import com.airline.DTO.booking.BookingSummaryDTO;
 import com.airline.entity.BookingEntity;
+import com.airline.entity.FlightEntity;
+import com.airline.entity.FlightSeatEntity;
 
 public class BookingConverter {
 
@@ -17,4 +22,26 @@ public class BookingConverter {
         dto.setStatus(entity.getStatus());
         return dto;
     }
+   
+
+    public static BookingSummaryDTO toSummaryDTO(BookingEntity booking) {
+        FlightEntity flight = booking.getFlight();
+        FlightSeatEntity seat = booking.getSeat();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+
+        BookingSummaryDTO dto = new BookingSummaryDTO();
+        dto.setFlightNumber(flight.getFlightNumber());
+        dto.setBookingDate(booking.getBookingDate().format(formatter));
+
+        dto.setRoute(flight.getDepartureAirport().getCity() + " - " + flight.getArrivalAirport().getCity());
+        dto.setDepartureTime(flight.getDepartureTime().format(formatter));
+        dto.setArrivalTime(flight.getArrivalTime().format(formatter));
+
+        dto.setSeatNumber(seat.getSeatNumber());
+
+        return dto;
+    }
+
+
 }

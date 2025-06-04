@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class BookingStatisticsDTO {
     private String aircraftModel;
-    private String route;
+    private String route; // HaNoi - Ho Chi Minh city, Hanoi - kuala lumpur
     private String departureTime;
     private String passengerName;
 

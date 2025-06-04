@@ -14,10 +14,14 @@ import java.util.List;
 @Repository
 public interface FlightRepository extends JpaRepository<FlightEntity, Long> {
 
-	@Query("SELECT f FROM FlightEntity f " + "JOIN f.departureAirport da " + "JOIN f.arrivalAirport aa "
+	@Query("SELECT f FROM FlightEntity f " + "JOIN FETCH f.departureAirport da " + "JOIN FETCH f.arrivalAirport aa "
 			+ "WHERE da.code = :departureCode " + "AND aa.code = :arrivalCode "
 			+ "AND f.departureTime BETWEEN :from AND :to")
 	List<FlightEntity> searchFlightsByAirportNames(@Param("departureCode") String departureCode,
 			@Param("arrivalCode") String arrivalCode, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+	@Query(value = "SELECT * FROM flights f " + "JOIN airlines a ON f.airline_id = a.airline_id "
+			+ "JOIN aircrafts ac ON ac.airline_id = a.airline_id " + "WHERE ac.model = :model", nativeQuery = true)
+	List<FlightEntity> findByAircraftModel(@Param("model") String model);
 
 }
