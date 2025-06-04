@@ -2,28 +2,37 @@ package com.airline.DTO.flight;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class FlightDelayRequest {
+    private String newDepartureTime; 
+    private String newArrivalTime;
+
     
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime newDepartureTime;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime newArrivalTime;
 
-    public LocalDateTime getNewDepartureTime() {
-        return newDepartureTime;
+    public LocalDateTime getParsedNewDepartureTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+        return LocalDateTime.parse(newDepartureTime, formatter);
     }
 
-    public void setNewDepartureTime(LocalDateTime newDepartureTime) {
-        this.newDepartureTime = newDepartureTime;
+    public LocalDateTime getParsedNewArrivalTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+        return LocalDateTime.parse(newArrivalTime, formatter);
     }
 
-    public LocalDateTime getNewArrivalTime() {
-        return newArrivalTime;
-    }
+	public String getNewDepartureTime() {
+		return newDepartureTime;
+	}
 
-    public void setNewArrivalTime(LocalDateTime newArrivalTime) {
-        this.newArrivalTime = newArrivalTime;
-    }
+	public void setNewDepartureTime(String newDepartureTime) {
+		this.newDepartureTime = newDepartureTime;
+	}
+
+	public String getNewArrivalTime() {
+		return newArrivalTime;
+	}
+
+	public void setNewArrivalTime(String newArrivalTime) {
+		this.newArrivalTime = newArrivalTime;
+	}
 }

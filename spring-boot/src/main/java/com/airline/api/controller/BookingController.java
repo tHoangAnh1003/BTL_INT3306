@@ -153,20 +153,22 @@ public class BookingController {
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
     }
 
-    @GetMapping("/{id}/can-cancel")
-    public ResponseEntity<Boolean> canCancel(@PathVariable Long id) {
-        return ResponseEntity.ok(bookingService.canCancelBooking(id));
+    @DeleteMapping("/cancel/{bookingId}")
+    public ResponseEntity<?> cancelBooking(HttpServletRequest request,
+                                           @PathVariable Long bookingId) {
+        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn cần đăng nhập");
+        }
+
+        try {
+            bookingService.cancelBooking(bookingId, user.getId());
+            return ResponseEntity.ok("Hủy vé thành công");
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @PostMapping("/{id}/cancel")
-    public ResponseEntity<String> cancelBooking(@PathVariable Long id) {
-        boolean result = bookingService.cancelBooking(id);
-        if (result) {
-            return ResponseEntity.ok("Đã hủy đặt vé thành công.");
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Không thể hủy: đã quá hạn hoặc trạng thái không hợp lệ.");
-    }
     
     @GetMapping("/statistics")
     public ResponseEntity<List<BookingStatisticsDTO>> getBookingStatistics(HttpServletRequest request) {

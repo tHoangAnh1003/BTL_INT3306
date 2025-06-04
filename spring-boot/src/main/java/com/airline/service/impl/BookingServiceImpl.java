@@ -59,32 +59,33 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public boolean canCancelBooking(Long bookingId) {
-    	Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
-        if (!optionalBooking.isPresent()) return false;
-
-        BookingEntity booking = optionalBooking.get();
-        FlightEntity flight = flightService.getFlightById(booking.getFlight().getId());
-        if (flight == null) return false;
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime departureTime = flight.getDepartureTime();
-
-        long hoursUntilDeparture = java.time.Duration.between(now, departureTime).toHours();
-        return hoursUntilDeparture >= CANCEL_DEADLINE_HOURS && "Confirmed".equalsIgnoreCase(booking.getStatus());
+    public BookingEntity findById(Long id) {
+        Optional<BookingEntity> bookingOpt = bookingRepository.findById(id);
+        if (bookingOpt.isPresent()) {
+            throw new RuntimeException("Booking not found with id: " + id);
+        }
+        return bookingOpt.get();
     }
 
     @Override
-    public boolean cancelBooking(Long bookingId) {
-        Optional<BookingEntity> optionalBooking = bookingRepository.findById(bookingId);
-        if (!optionalBooking.isPresent()) return false;
-
-        BookingEntity booking = optionalBooking.get();
-        if (!canCancelBooking(bookingId)) return false;
-
-        booking.setStatus("Cancelled");
+    public void save(BookingEntity booking) {
         bookingRepository.save(booking);
-        return true;
+    }
+
+    @Override
+    public void cancelBooking(Long bookingId, Long userId) {
+        BookingEntity booking = findById(bookingId);
+
+        if (!booking.getPassenger().getId().equals(userId)) {
+            throw new RuntimeException("User không có quyền hủy vé này");
+        }
+
+        if ("CANCELLED".equalsIgnoreCase(booking.getStatus())) {
+            throw new RuntimeException("Vé đã bị hủy trước đó");
+        }
+
+        booking.setStatus("CANCELLED");
+        bookingRepository.save(booking);
     }
     
     @Override

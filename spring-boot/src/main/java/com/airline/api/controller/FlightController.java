@@ -2,6 +2,7 @@ package com.airline.api.controller;
 
 import com.airline.DTO.flight.FlightCreateRequest;
 import com.airline.DTO.flight.FlightDelayRequest;
+import com.airline.DTO.flight.FlightDelayResponse;
 import com.airline.DTO.flight.FlightResponseDTO;
 import com.airline.converter.FlightConverter;
 import com.airline.entity.AirlineEntity;
@@ -73,19 +74,7 @@ public class FlightController {
     }
 
 
-    // 3. Create Flight
-//    @PostMapping
-//    public ResponseEntity<?> create(HttpServletRequest request, @RequestBody FlightEntity flight) {
-//        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-//
-//        if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin hoặc staff mới được thêm chuyến bay");
-//        }
-//
-//        flightService.createFlight(flight);
-//        return ResponseEntity.status(HttpStatus.CREATED).build();
-//    }
-    
+    // 3. Create Flight    
     @PostMapping
     public ResponseEntity<?> create(HttpServletRequest request, @RequestBody FlightCreateRequest dto) {
         UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
@@ -224,10 +213,21 @@ public class FlightController {
                     "Chỉ admin hoặc staff mới được phép delay chuyến bay");
         }
 
-        flightService.delayFlight(flightId, dto.getNewDepartureTime(), dto.getNewArrivalTime());
-        return ResponseEntity.ok(
-                java.util.Collections.singletonMap("msg", "Cập nhật giờ khởi hành/thời gian đến thành công")
+        LocalDateTime newDep = dto.getParsedNewDepartureTime();
+        LocalDateTime newArr = dto.getParsedNewArrivalTime();
+
+        flightService.delayFlight(flightId, newDep, newArr);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+
+        FlightDelayResponse response = new FlightDelayResponse(
+            "Cập nhật giờ khởi hành và thời gian đến thành công",
+            newDep.format(formatter),
+            newArr.format(formatter)
         );
+
+        return ResponseEntity.ok(response);
     }
+
 
 }

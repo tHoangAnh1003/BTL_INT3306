@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +57,7 @@ public class NewsController {
 
         news.setAuthor(user.getUsername());
         newsService.createNews(news);
+        news.setCreatedAt(LocalDateTime.now()); 
 
         Map<String, Object> resp = new HashMap<>();
         resp.put("message", "Tạo tin thành công");
