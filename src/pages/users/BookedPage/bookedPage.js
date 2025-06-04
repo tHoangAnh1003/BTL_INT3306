@@ -1,80 +1,125 @@
 import { useEffect, useState } from "react";
 import "./bookedPage.scss";
+
 const BookedPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userId = localStorage.getItem("userId"); // hoặc username/email
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`http://localhost:8081/api/bookings?userId=${userId}`);
-        const data = await res.json();
-        setBookings(data);
-      } catch (err) {
-        setBookings([]);
-      }
-      setLoading(false);
-    };
     fetchBookings();
-  }, [userId]);
+    // eslint-disable-next-line
+  }, []);
 
-  const handleCancel = async (bookingId) => {
-    if (!window.confirm("Bạn chắc chắn muốn hủy vé này?")) return;
+  const fetchBookings = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8081/api/bookings/${bookingId}/cancel`, {
-        method: "POST",
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch("http://localhost:8081/api/bookings/my", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (res.ok) {
-        setBookings(bookings.map(b =>
-          b.id === bookingId ? { ...b, status: "Đã hủy" } : b
-        ));
-      } else {
-        alert("Không thể hủy vé. Vui lòng thử lại.");
+      const data = await res.json();
+      setBookings(data);
+    } catch (err) {
+      setBookings([]);
+    }
+    setLoading(false);
+  };
+
+  // Kiểm tra còn hạn hủy: chưa bị hủy và chưa khởi hành
+  const canCancel = (booking) => {
+    if (booking.status && booking.status.toLowerCase() === "cancelled") return false;
+    if (!booking.departureTime) return false;
+    const now = new Date();
+    // Chuyển departureTime về dạng Date, ví dụ "02 Apr 2025, 21:00"
+    const dep = new Date(
+      booking.departureTime.replace(/(\d{2}) (\w{3}) (\d{4}), (\d{2}):(\d{2})/, (m, d, mon, y, h, min) => {
+        const months = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+        return `${y}-${String(months[mon]+1).padStart(2,"0")}-${d}T${h}:${min}:00`;
+      })
+    );
+    return now < dep;
+  };
+
+  // Hàm hủy vé
+  const handleCancel = async (booking, idx) => {
+    setMsg("");
+    try {
+      const token = localStorage.getItem("accessToken");
+      const bookingId = booking.bookingId || booking.id || booking.booking_id;
+      const res = await fetch(
+        `http://localhost:8081/api/bookings/${bookingId}/cancel`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!res.ok) {
+        const data = await res.json();
+        setMsg(data.message || "Hủy vé thất bại");
+        return;
       }
+      setMsg("Hủy vé thành công!");
+      fetchBookings();
     } catch {
-      alert("Có lỗi xảy ra khi hủy vé.");
+      setMsg("Lỗi kết nối máy chủ");
     }
   };
 
   return (
-    <div className="booking-manage-wrapper">
-      <h2>Quản lý đặt chỗ của bạn</h2>
+    <div className="booked-page">
+      <h2>Lịch sử đặt vé của bạn</h2>
+      {msg && <div className="booking-msg">{msg}</div>}
       {loading ? (
         <div>Đang tải dữ liệu...</div>
       ) : (
-        <table className="booking-table">
+        <table className="booked-table">
           <thead>
             <tr>
-              <th>ID Khách hàng</th>
-              <th>ID Ghế ngồi</th>
-              <th>Ngày đặt vé</th>
+              <th>Số hiệu chuyến bay</th>
+              <th>Số ghế</th>
+              <th>Thời gian đặt vé</th>
+              <th>Ngày đặt</th>
+              <th>Tuyến bay</th>
+              <th>Giờ khởi hành</th>
+              <th>Giờ đến</th>
               <th>Trạng thái</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {bookings.length === 0 && (
+            {bookings.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center" }}>Không có vé nào</td>
+                <td colSpan={9} style={{ textAlign: "center" }}>Bạn chưa đặt vé nào</td>
               </tr>
+            ) : (
+              bookings.map((b, idx) => (
+                <tr key={idx}>
+                  <td>{b.aircraftModel || b.flightNumber}</td>
+                  <td>{b.seatId || b.seatNumber}</td>
+                  <td>{b.time || b.bookingDate}</td>
+                  <td>{b.bookingDate}</td>
+                  <td>{b.route}</td>
+                  <td>{b.departureTime}</td>
+                  <td>{b.arrivalTime}</td>
+                  <td>{b.status || "Confirmed"}</td>
+                  <td>
+                    {canCancel(b) && (
+                      <button
+                        className="cancel-btn"
+                        onClick={() => handleCancel(b, idx)}
+                      >
+                        Hủy vé
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
             )}
-            {bookings.map(b => (
-              <tr key={b.id}>
-                <td>{b.userId}</td>
-                <td>{b.seatId}</td>
-                <td>{b.bookingDate}</td>
-                <td>{b.status}</td>
-                <td>
-                  {b.status === "Đã đặt" && b.canCancel ? (
-                    <button onClick={() => handleCancel(b.id)}>Hủy vé</button>
-                  ) : (
-                    <span style={{ color: "#888" }}>Không thể hủy</span>
-                  )}
-                </td>
-              </tr>
-            ))}
           </tbody>
         </table>
       )}

@@ -1,37 +1,97 @@
 .flight-result-wrapper {
-  padding: 2rem;
+  max-width: 900px;
+  margin: 32px auto;
   background: #fff;
-  min-height: 60vh;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px 24px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+
+  h2 {
+    text-align: center;
+    color: #0071c2;
+    margin-bottom: 24px;
+  }
 
   .search-info {
-    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin-bottom: 24px;
     span {
-      margin-right: 2rem;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
+      color: #333;
+      b {
+        color: #0071c2;
+      }
     }
   }
 
   .flight-table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 16px;
     th, td {
-      border: 1px solid #ddd;
-      padding: 0.75rem;
+      padding: 12px 10px;
+      border-bottom: 1px solid #e0e0e0;
       text-align: center;
     }
     th {
-      background: #f5f5f5;
+      background: #f2f8fc;
+      color: #0071c2;
+      font-weight: 600;
     }
-    button {
-      background: #0071c2;
-      color: #fff;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      &:hover {
-        background: #005fa3;
-      }
+    tr:hover {
+      background: #f8fafc;
     }
+  }
+
+  .booking-msg {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 1.1rem;
+    color: #fff;
+    background: #4caf50;
+    border-radius: 6px;
+    padding: 10px 0;
+    &.error {
+      background: #e53935;
+    }
+  }
+
+  .book-btn {
+    background: #0071c2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover {
+      background: #005fa3;
+    }
+  }
+
+  .booking-success-dialog {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4caf50;
+    color: #fff;
+    padding: 18px 36px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    z-index: 9999;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    animation: fadeInOut 2s;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
   }
 }

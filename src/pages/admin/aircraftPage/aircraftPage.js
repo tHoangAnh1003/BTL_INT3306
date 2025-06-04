@@ -3,10 +3,9 @@ import "./aircraftPage.scss";
 
 const AircraftPage = () => {
   const [form, setForm] = useState({
-    code: "",
-    manufacturer: "",
-    seatInfo: "",
-    description: "",
+    airline: "",
+    model: "",
+    capacity: "",
   });
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -20,18 +19,22 @@ const AircraftPage = () => {
     setSuccess("");
     setError("");
     try {
-      const res = await fetch("http://localhost:8081/api/admin/aircraft", {
+      const res = await fetch("http://localhost:8081/api/aircrafts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          airline: form.airline,
+          model: form.model,
+          capacity: Number(form.capacity),
+        }),
       });
       if (!res.ok) {
         const data = await res.json();
         setError(data.message || "Lỗi khi lưu dữ liệu");
         return;
       }
-      setSuccess("Lưu thành công!");
-      setForm({ code: "", manufacturer: "", seatInfo: "", description: "" });
+      setSuccess("Lưu tàu bay thành công!");
+      setForm({ airline: "", model: "", capacity: "" });
     } catch {
       setError("Lỗi kết nối máy chủ");
     }
@@ -42,38 +45,35 @@ const AircraftPage = () => {
       <h2>Nhập thông tin tàu bay</h2>
       <form onSubmit={handleSubmit} className="aircraft-form">
         <label>
-          Mã tàu bay:
+          Hãng hàng không:
           <input
-            name="code"
-            value={form.code}
+            name="airline"
+            value={form.airline}
             onChange={handleChange}
             required
+            placeholder="Vietnam Airlines"
           />
         </label>
         <label>
-          Hãng sản xuất:
+          Model:
           <input
-            name="manufacturer"
-            value={form.manufacturer}
+            name="model"
+            value={form.model}
             onChange={handleChange}
             required
+            placeholder="Boeing 787"
           />
         </label>
         <label>
-          Thông tin ghế (ví dụ: 180 ghế, chia hạng...):
+          Sức chứa:
           <input
-            name="seatInfo"
-            value={form.seatInfo}
+            name="capacity"
+            type="number"
+            min={1}
+            value={form.capacity}
             onChange={handleChange}
             required
-          />
-        </label>
-        <label>
-          Mô tả thêm:
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
+            placeholder="500"
           />
         </label>
         <button type="submit">Lưu</button>

@@ -5,84 +5,146 @@ import "./flightResult.scss";
 const FlightResultPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [flights, setFlights] = useState([]);
+  const { params, tripType, from, to, departDate, returnDate } = location.state || {};
+  const [flightsGo, setFlightsGo] = useState([]);
+  const [flightsReturn, setFlightsReturn] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Lấy thông tin tìm kiếm từ location.state
-  const searchParams = location.state || {};
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     const fetchFlights = async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams({
-          from: searchParams.from,
-          to: searchParams.to,
-          departDate: searchParams.departDate,
-          ...(searchParams.returnDate ? { returnDate: searchParams.returnDate } : {}),
-        });
-        const res = await fetch(`http://localhost:8081/api/flights?${params.toString()}`);
-        const data = await res.json();
-        setFlights(data);
+        if (tripType === "oneway" || (tripType === "round" && departDate && !returnDate)) {
+          const res = await fetch(`http://localhost:8081/api/flights/search?departure=${from}&arrival=${to}&departureDate=${departDate}`);
+          const data = await res.json();
+          setFlightsGo(data);
+          setFlightsReturn([]);
+        } else if (tripType === "round" && !departDate && returnDate) {
+          const res = await fetch(`http://localhost:8081/api/flights/search?departure=${to}&arrival=${from}&departureDate=${returnDate}`);
+          const data = await res.json();
+          setFlightsGo([]);
+          setFlightsReturn(data);
+        } else if (tripType === "round" && departDate && returnDate) {
+          const resGo = await fetch(`http://localhost:8081/api/flights/search?departure=${from}&arrival=${to}&departureDate=${departDate}`);
+          const dataGo = await resGo.json();
+          setFlightsGo(dataGo);
+          const resReturn = await fetch(`http://localhost:8081/api/flights/search?departure=${to}&arrival=${from}&departureDate=${returnDate}`);
+          const dataReturn = await resReturn.json();
+          setFlightsReturn(dataReturn);
+        }
       } catch (err) {
-        setFlights([]);
+        setFlightsGo([]);
+        setFlightsReturn([]);
       }
       setLoading(false);
     };
     fetchFlights();
-  }, [searchParams]);
+  }, [params, tripType, from, to, departDate, returnDate]);
 
-  const handleBook = (flight) => {
-    // Điều hướng sang trang đặt vé chi tiết, truyền flight nếu cần
-    alert(`Đặt vé cho chuyến bay ${flight.from} - ${flight.to}`);
-    // navigate("/booking-detail", { state: { flight } });
+  // Hàm đặt vé
+  const handleBook = async (flight) => {
+    setSuccessMsg("");
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setSuccessMsg("Vui lòng đăng nhập để đặt vé!");
+      setTimeout(() => navigate("/login"), 1500);
+      return;
+    }
+    // Lấy số hiệu chuyến bay (aircraftModel)
+    const aircraftModel = flight.flightNumber || flight.aircraftModel || flight.model || "Unknown";
+    // Lấy seatId (ở đây demo lấy 1, thực tế nên lấy từ dữ liệu ghế)
+    const seatId = 1;
+    // Lưu thời gian đặt vé hiện tại
+    const now = new Date();
+    const time = now.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+    try {
+      const res = await fetch("http://localhost:8081/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          aircraftModel,
+          seatId,
+          status: "CONFIRMED",
+          time,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setSuccessMsg(data.message || "Đặt vé thất bại!");
+        return;
+      }
+      setSuccessMsg("Đặt vé thành công");
+    } catch {
+      setSuccessMsg("Lỗi kết nối máy chủ");
+    }
   };
+
+  // Bảng chuyến bay (dùng cho cả chiều đi/lẫn về)
+  const renderFlightTable = (flights) => (
+    <table className="flight-table">
+      <thead>
+        <tr>
+          <th>Số hiệu chuyến bay</th>
+          <th>Điểm đi</th>
+          <th>Điểm đến</th>
+          <th>Giờ khởi hành</th>
+          <th>Giờ đến</th>
+          <th>Trạng thái</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {flights.map((f, idx) => (
+          <tr key={idx}>
+            <td>{f.flightNumber}</td>
+            <td>{f.departure}</td>
+            <td>{f.arrival}</td>
+            <td>{f.departureTime}</td>
+            <td>{f.arrivalTime}</td>
+            <td>{f.status}</td>
+            <td>
+              <button className="book-btn" onClick={() => handleBook(f)}>
+                Đặt vé
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 
   return (
     <div className="flight-result-wrapper">
       <h2>Kết quả tìm kiếm chuyến bay</h2>
-      <div className="search-info">
-        <span>Điểm đi: <b>{searchParams.from}</b></span>
-        <span>Điểm đến: <b>{searchParams.to}</b></span>
-        <span>Ngày đi: <b>{searchParams.departDate}</b></span>
-        {searchParams.returnDate && (
-          <span>Ngày về: <b>{searchParams.returnDate}</b></span>
-        )}
-      </div>
+      {successMsg && (
+        <div className="booking-success-dialog">
+          {successMsg}
+        </div>
+      )}
       {loading ? (
         <div>Đang tải dữ liệu...</div>
       ) : (
-        <table className="flight-table">
-          <thead>
-            <tr>
-              <th>Điểm đi</th>
-              <th>Điểm đến</th>
-              <th>Ngày đi</th>
-              <th>Ngày về</th>
-              <th>Giá tiền</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {flights.length === 0 && (
-              <tr>
-                <td colSpan={6} style={{ textAlign: "center" }}>Không tìm thấy chuyến bay phù hợp</td>
-              </tr>
-            )}
-            {flights.map(f => (
-              <tr key={f.id}>
-                <td>{f.from}</td>
-                <td>{f.to}</td>
-                <td>{f.departDate}</td>
-                <td>{f.returnDate || "-"}</td>
-                <td>{f.price?.toLocaleString()} VNĐ</td>
-                <td>
-                  <button onClick={() => handleBook(f)}>Đặt vé</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <>
+          {flightsGo.length > 0 && (
+            <>
+              <h3>Chuyến bay chiều đi</h3>
+              {renderFlightTable(flightsGo)}
+            </>
+          )}
+          {flightsReturn.length > 0 && (
+            <>
+              <h3>Chuyến bay chiều về</h3>
+              {renderFlightTable(flightsReturn)}
+            </>
+          )}
+          {flightsGo.length === 0 && flightsReturn.length === 0 && (
+            <div style={{ textAlign: "center" }}>Không tìm thấy chuyến bay phù hợp</div>
+          )}
+        </>
       )}
     </div>
   );

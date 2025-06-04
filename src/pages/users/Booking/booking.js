@@ -2,20 +2,15 @@ import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Booking/booking.scss";
 
-
 const tripTabs = [
-  {
-    id: "round", label: "Khứ hồi"
-  },
-  {
-    id: "oneway", label: "Một chiều"
-  },
-]
+  { id: "round", label: "Khứ hồi" },
+  { id: "oneway", label: "Một chiều" },
+];
 
 const BookingPage = () => {
   const navigate = useNavigate();
 
-  const [tripType, setTripType] = useState("round");
+  const [tripType, setTripType] = useState("oneway");
   const [form, setForm] = useState({
     from: "",
     to: "",
@@ -34,7 +29,8 @@ const BookingPage = () => {
       setLoadingAirports(true);
       try {
         const res = await fetch("http://localhost:8081/api/airports");
-        const data = await res.json();
+        let data = await res.json();
+        if (!Array.isArray(data)) data = [];
         setAirports(data);
       } catch (err) {
         setAirports([]);
@@ -50,17 +46,48 @@ const BookingPage = () => {
   }, []);
 
   const onChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+
+  // Xử lý tìm chuyến bay
   const handleSearch = () => {
-    navigate("/ket-qua-chuyen-bay", { state: form });
+    let params = {};
+    if (tripType === "oneway") {
+      params = {
+        departure: form.from,
+        arrival: form.to,
+        departureDate: form.departDate,
+      };
+    } else {
+      // Khứ hồi
+      if (form.departDate && form.returnDate) {
+        params = {
+          departure: form.from,
+          arrival: form.to,
+          departureDate: form.departDate,
+          returnDate: form.returnDate,
+        };
+      } else if (form.departDate) {
+        params = {
+          departure: form.from,
+          arrival: form.to,
+          departureDate: form.departDate,
+        };
+      } else if (form.returnDate) {
+        params = {
+          departure: form.to, // Đảo chiều cho chuyến về
+          arrival: form.from,
+          departureDate: form.returnDate,
+        };
+      }
+    }
+    navigate("/ket-qua-chuyen-bay", {
+      state: { ...form, params: new URLSearchParams(params).toString(), tripType }
+    });
   };
 
   return (
     <div id="booking-section">
       <h1>Mua vé</h1>
-
-      {/* Tabs loại chuyến */}
       <div className="recent-box">
-        {/* <h3>Tra cứu gần đây</h3> */}
         <ul className="trip-tabs">
           {tripTabs.map(t => (
             <li key={t.id}
@@ -85,7 +112,7 @@ const BookingPage = () => {
             disabled={loadingAirports}
           >
             <option value="">Chọn điểm đi</option>
-            {airports.map(a => (
+            {Array.isArray(airports) && airports.map(a => (
               <option key={a.code || a.id} value={a.name}>{a.name}</option>
             ))}
           </select>
@@ -108,24 +135,20 @@ const BookingPage = () => {
         </div>
         <div>
           <label htmlFor="departDate">Ngày đi</label>
-          <input id="departDate" type="date" name="departDate" value={form.departDate} onChange={onChange} required />
+          <input id="departDate" type="date" name="departDate" value={form.departDate} onChange={onChange} />
         </div>
         {tripType === "round" && (
           <div>
             <label htmlFor="returnDate">Ngày về</label>
-            <input id="returnDate" type="date" name="returnDate" value={form.returnDate} onChange={onChange} required />
+            <input id="returnDate" type="date" name="returnDate" value={form.returnDate} onChange={onChange} />
           </div>
         )}
-        
         <button type="button" onClick={handleSearch} disabled={loadingAirports}>
           {loadingAirports ? "Đang tải..." : "Tìm chuyến bay"}
         </button>
       </form>
-
-      {/* Danh sách chuyến bay */}
-      {/* content */}
     </div>
   );
-}
+};
 
 export default memo(BookingPage);

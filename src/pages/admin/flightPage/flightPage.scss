@@ -84,5 +84,23 @@
       margin-top: 8px;
       font-size: 0.98rem;
     }
+
+    select[name="status"] {
+      padding: 8px 12px;
+      border: 1.5px solid #0071c2;
+      border-radius: 6px;
+      background: #f8fafd;
+      font-size: 1rem;
+      color: #003366;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      transition: border 0.2s;
+
+      &:focus {
+        border: 1.5px solid #005fa3;
+        background: #fff;
+        outline: none;
+      }
+    }
   }
 }
