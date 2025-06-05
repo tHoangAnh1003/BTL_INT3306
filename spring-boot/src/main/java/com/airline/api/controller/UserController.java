@@ -103,5 +103,4 @@ public class UserController {
         response.put("message", "Tạo nhân viên thành công");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
 }

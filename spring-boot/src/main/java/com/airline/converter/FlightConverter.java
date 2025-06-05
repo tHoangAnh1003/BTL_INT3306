@@ -21,6 +21,7 @@ public class FlightConverter {
     // Entity -> DTO
 	public static FlightResponseDTO toDTO(FlightEntity entity) {
         FlightResponseDTO dto = new FlightResponseDTO();
+        dto.setFlightId(entity.getId());
         dto.setFlightNumber(entity.getFlightNumber());
         dto.setDepartureTime(entity.getDepartureTime());
         dto.setArrivalTime(entity.getArrivalTime());

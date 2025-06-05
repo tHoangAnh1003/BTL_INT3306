@@ -3,6 +3,7 @@ package com.airline.api.controller;
 import com.airline.entity.NewsEntity;
 import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
+import com.airline.security.JwtAuthenticationFilter_Test;
 import com.airline.service.NewsService;
 import com.airline.utils.AuthUtil;
 
@@ -47,6 +48,7 @@ public class NewsController {
     @PostMapping
     public ResponseEntity<?> create(HttpServletRequest request,
                                     @RequestBody NewsEntity news) {
+
         UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
 
         if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
@@ -56,8 +58,8 @@ public class NewsController {
         }
 
         news.setAuthor(user.getUsername());
+        news.setCreatedAt(LocalDateTime.now());
         newsService.createNews(news);
-        news.setCreatedAt(LocalDateTime.now()); 
 
         Map<String, Object> resp = new HashMap<>();
         resp.put("message", "Tạo tin thành công");

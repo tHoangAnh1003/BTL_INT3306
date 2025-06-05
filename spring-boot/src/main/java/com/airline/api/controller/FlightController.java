@@ -1,5 +1,6 @@
 package com.airline.api.controller;
 
+import com.airline.DTO.error.ErrorResponse;
 import com.airline.DTO.flight.FlightCreateRequest;
 import com.airline.DTO.flight.FlightDelayRequest;
 import com.airline.DTO.flight.FlightDelayResponse;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,43 +77,107 @@ public class FlightController {
 
 
     // 3. Create Flight    
+//    @PostMapping
+//    public ResponseEntity<?> create(HttpServletRequest request, @RequestBody FlightCreateRequest dto) {
+//        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+//
+//        if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin hoặc staff mới được thêm chuyến bay");
+//        }
+//
+//        AirlineEntity airline = airlineRepository.findByName(dto.getAirline());
+//        if (airline == null) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hãng bay không tồn tại");
+//        }
+//
+//        Optional<AirportEntity> depAirportOpt = airportRepository.findByCity(dto.getDepartureAirport());
+//        AirportEntity departureAirport = depAirportOpt.orElseThrow(() ->
+//            new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sân bay đi không tồn tại"));
+//
+//        Optional<AirportEntity> arrAirportOpt = airportRepository.findByCity(dto.getArrivalAirport());
+//        AirportEntity arrivalAirport = arrAirportOpt.orElseThrow(() ->
+//            new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sân bay đến không tồn tại"));
+//
+//        LocalDateTime departureTime = LocalDateTime.parse(dto.getDepartureTime());
+//        LocalDateTime arrivalTime = LocalDateTime.parse(dto.getArrivalTime());
+//
+//        FlightEntity flight = new FlightEntity();
+//        flight.setAirline(airline);
+//        flight.setFlightNumber(dto.getFlightNumber());
+//        flight.setDepartureAirport(departureAirport);
+//        flight.setArrivalAirport(arrivalAirport);
+//        flight.setDepartureTime(departureTime);
+//        flight.setArrivalTime(arrivalTime);
+//        flight.setStatus(dto.getStatus());
+//
+//        flightService.createFlight(flight);
+//        return ResponseEntity.status(HttpStatus.CREATED).build();
+//    }
+
     @PostMapping
     public ResponseEntity<?> create(HttpServletRequest request, @RequestBody FlightCreateRequest dto) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+        try {
+            UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+            
+            String userRole = (String) request.getAttribute("userRole");
+            System.out.println("User role in controller: " + userRole);
+            
+            if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse("Chỉ admin hoặc staff mới được thêm chuyến bay"));
+            }
 
-        if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ admin hoặc staff mới được thêm chuyến bay");
+            AirlineEntity airline = airlineRepository.findByName(dto.getAirline());
+            if (airline == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Hãng bay không tồn tại"));
+            }
+
+            Optional<AirportEntity> depAirportOpt = airportRepository.findByCity(dto.getDepartureAirport());
+            if (!depAirportOpt.isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Sân bay đi không tồn tại"));
+            }
+            AirportEntity departureAirport = depAirportOpt.get();
+
+            Optional<AirportEntity> arrAirportOpt = airportRepository.findByCity(dto.getArrivalAirport());
+            if (!arrAirportOpt.isPresent()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Sân bay đến không tồn tại"));
+            }
+            AirportEntity arrivalAirport = arrAirportOpt.get();
+
+            LocalDateTime departureTime;
+            LocalDateTime arrivalTime;
+            try {
+                departureTime = LocalDateTime.parse(dto.getDepartureTime());
+                arrivalTime = LocalDateTime.parse(dto.getArrivalTime());
+            } catch (DateTimeParseException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Định dạng ngày giờ không hợp lệ. Ví dụ: 2025-06-15T08:30"));
+            }
+
+            FlightEntity flight = new FlightEntity();
+            flight.setAirline(airline);
+            flight.setFlightNumber(dto.getFlightNumber());
+            flight.setDepartureAirport(departureAirport);
+            flight.setArrivalAirport(arrivalAirport);
+            flight.setDepartureTime(departureTime);
+            flight.setArrivalTime(arrivalTime);
+            flight.setStatus(dto.getStatus());
+
+            flightService.createFlight(flight);
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Lỗi server nội bộ"));
         }
-
-        AirlineEntity airline = airlineRepository.findByName(dto.getAirline());
-        if (airline == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hãng bay không tồn tại");
-        }
-
-        Optional<AirportEntity> depAirportOpt = airportRepository.findByCity(dto.getDepartureAirport());
-        AirportEntity departureAirport = depAirportOpt.orElseThrow(() ->
-            new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sân bay đi không tồn tại"));
-
-        Optional<AirportEntity> arrAirportOpt = airportRepository.findByCity(dto.getArrivalAirport());
-        AirportEntity arrivalAirport = arrAirportOpt.orElseThrow(() ->
-            new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sân bay đến không tồn tại"));
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm");
-        LocalDateTime departureTime = LocalDateTime.parse(dto.getDepartureTime(), formatter);
-        LocalDateTime arrivalTime = LocalDateTime.parse(dto.getArrivalTime(), formatter);
-
-        FlightEntity flight = new FlightEntity();
-        flight.setAirline(airline);
-        flight.setFlightNumber(dto.getFlightNumber());
-        flight.setDepartureAirport(departureAirport);
-        flight.setArrivalAirport(arrivalAirport);
-        flight.setDepartureTime(departureTime);
-        flight.setArrivalTime(arrivalTime);
-        flight.setStatus(dto.getStatus());
-
-        flightService.createFlight(flight);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+
 
 
     // 4. Update Flight
@@ -146,14 +212,14 @@ public class FlightController {
     // 6. Search Flights    
     @GetMapping("/search")
     public ResponseEntity<?> searchFlights(
-            @RequestParam String departure,
-            @RequestParam String arrival,
+            @RequestParam String departure, 
+            @RequestParam String arrival,    
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate
     ) {
-        AirportEntity departureAirport = airportRepository.findByCity(departure)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid departure city"));
-        AirportEntity arrivalAirport = airportRepository.findByCity(arrival)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid arrival city"));
+        AirportEntity departureAirport = airportRepository.findByName(departure)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid departure airport name"));
+        AirportEntity arrivalAirport = airportRepository.findByName(arrival)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid arrival airport name"));
 
         List<FlightEntity> flights = flightService.searchFlights(
                 departureAirport.getCode(), arrivalAirport.getCode(), departureDate);
@@ -166,18 +232,18 @@ public class FlightController {
         return ResponseEntity.ok(response);
     }
 
-    
+
     @GetMapping("/search/round-trip")
     public ResponseEntity<?> searchRoundTripFlights(
-            @RequestParam String departure,
-            @RequestParam String arrival,
+            @RequestParam String departure,  
+            @RequestParam String arrival,    
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate
     ) {
-        AirportEntity departureAirport = airportRepository.findByCity(departure)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid departure city"));
-        AirportEntity arrivalAirport = airportRepository.findByCity(arrival)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid arrival city"));
+        AirportEntity departureAirport = airportRepository.findByName(departure)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid departure airport name"));
+        AirportEntity arrivalAirport = airportRepository.findByName(arrival)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid arrival airport name"));
 
         List<FlightEntity> departureFlights = flightService.searchFlights(
                 departureAirport.getCode(), arrivalAirport.getCode(), departureDate);
@@ -185,7 +251,7 @@ public class FlightController {
         for (FlightEntity entity : departureFlights) {
             departureResponses.add(FlightConverter.toDTO(entity));
         }
-
+        
         List<FlightEntity> returnFlights = flightService.searchFlights(
                 arrivalAirport.getCode(), departureAirport.getCode(), returnDate);
         List<FlightResponseDTO> returnResponses = new ArrayList<>();
@@ -199,6 +265,7 @@ public class FlightController {
 
         return ResponseEntity.ok(response);
     }
+
 
     
     @PutMapping("/{id}/delay")
@@ -220,7 +287,7 @@ public class FlightController {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
 
-        FlightDelayResponse response = new FlightDelayResponse(
+        FlightDelayResponse response = new FlightDelayResponse(	
             "Cập nhật giờ khởi hành và thời gian đến thành công",
             newDep.format(formatter),
             newArr.format(formatter)

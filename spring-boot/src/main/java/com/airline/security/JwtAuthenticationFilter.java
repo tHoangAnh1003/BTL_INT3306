@@ -33,12 +33,18 @@ public class JwtAuthenticationFilter implements Filter {
             if (jwtUtil.isTokenValid(token)) {
                 Long userId = jwtUtil.getUserIdFromToken(token);
                 Optional<UserEntity> user = userRepository.findById(userId);
-                if (user.isPresent()) {
-                    // Gán UserEntity vào request attribute để controller/service lấy ra dùng
-                    request.setAttribute(USER_ATTR, user.get());
+                if (user.isPresent()) {	
+                	UserEntity authenticatedUser = user.get();
+                    request.setAttribute(USER_ATTR, authenticatedUser);
+
+                    request.setAttribute("userRole", authenticatedUser.getRole());
+                    request.setAttribute("userId", authenticatedUser.getId());
+                    request.setAttribute("userEmail", authenticatedUser.getEmail());
                 }
             }
         }
+        
+//        System.out.println(">>> JWT Filter is running for path: " + request.getRequestURI());
 
         chain.doFilter(req, res);
     }

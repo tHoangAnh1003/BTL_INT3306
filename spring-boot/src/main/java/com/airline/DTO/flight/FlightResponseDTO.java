@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class FlightResponseDTO {
+	private Long flightId; 
     private String flightNumber;
     private String departure; // "Bangkok - Thailand"
     private String arrival;   // "Kuala Lumpur - Malaysia"
@@ -14,6 +15,8 @@ public class FlightResponseDTO {
     @JsonFormat(pattern = "dd MMM yyyy, HH:mm") 
     private LocalDateTime arrivalTime;
     private String status;
+    
+    
     
 	public String getFlightNumber() {
 		return flightNumber;
@@ -60,6 +63,14 @@ public class FlightResponseDTO {
 	
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Long getFlightId() {
+		return flightId;
+	}
+
+	public void setFlightId(Long flightId) {
+		this.flightId = flightId;
 	}
 }
 
