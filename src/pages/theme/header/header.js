@@ -103,18 +103,22 @@ const Header = () => {
         <ul className="qairline-nav-menu">
           {menus.map((m, i) => (
             <li key={i}>
-              {m.name === "Trang chủ" ? (
-                <Link
-                  to={m.path}
+              {m.name === "Thông tin chuyến bay" ? (
+                <a
+                  href="#"
                   className="qairline-nav-link"
                   onClick={e => {
                     e.preventDefault();
-                    navigate("/");
-                    setTimeout(() => window.location.reload(), 0);
+                    const token = localStorage.getItem("accessToken");
+                    if (!token) {
+                      navigate("/admin/dang-nhap");
+                    } else {
+                      navigate(m.path);
+                    }
                   }}
                 >
                   {m.name}
-                </Link>
+                </a>
               ) : (
                 <Link to={m.path} className="qairline-nav-link">
                   {m.name}

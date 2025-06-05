@@ -17,6 +17,12 @@ const ManageBookingPage = () => {
 
   const handleSearch = async () => {
     setMsg("");
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setMsg("Vui lòng đăng nhập để sử dụng chức năng này!");
+      setTimeout(() => navigate("/login"), 1200);
+      return;
+    }
     if (!code || !seatId) {
       setMsg("Vui lòng nhập đầy đủ mã khách hàng và mã ghế ngồi.");
       return;
@@ -25,7 +31,12 @@ const ManageBookingPage = () => {
       const res = await fetch(
         `http://localhost:8081/api/bookings/search?customerId=${encodeURIComponent(
           code
-        )}&seatId=${encodeURIComponent(seatId)}`
+        )}&seatId=${encodeURIComponent(seatId)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (!res.ok) {
         setMsg("Không tìm thấy thông tin đặt chỗ.");
