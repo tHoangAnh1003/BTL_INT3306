@@ -13,6 +13,7 @@ export const ROUTERS = {
     FLIGHT_RESULT: "ket-qua-chuyen-bay",
     BOOKED_FLIGHTS: "chuyen-bay-da-dat",
     NEWS: "tin-tuc",
+    PROFILE: "/ho-so",
   },
   ADMIN : {
     LOGIN: `${ADMIN_PATH}/dang-nhap`,

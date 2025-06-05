@@ -1,0 +1,85 @@
+.profile-page {
+  max-width: 800px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px 24px;
+
+  h2 {
+    text-align: center;
+    color: #0071c2;
+    margin-bottom: 24px;
+  }
+
+  .profile-tabs {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 24px;
+
+    button {
+      padding: 8px 24px;
+      border: none;
+      border-radius: 6px 6px 0 0;
+      background: #f2f8fc;
+      color: #0071c2;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      border-bottom: 2px solid transparent;
+      transition: background 0.2s, border-bottom 0.2s;
+
+      &.active {
+        background: #fff;
+        border-bottom: 2px solid #0071c2;
+        color: #222;
+      }
+    }
+  }
+
+  .profile-tab-content {
+    background: #fff;
+    border-radius: 0 0 12px 12px;
+    padding: 24px 0;
+    min-height: 200px;
+  }
+
+  .profile-info {
+    font-size: 1.1rem;
+    div {
+      margin-bottom: 12px;
+    }
+  }
+
+  .profile-booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+    th {
+      background: #f2f8fc;
+      color: #0071c2;
+      font-weight: 600;
+    }
+    .cancel-btn {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 14px;
+      cursor: pointer;
+      &:hover {
+        background: #b71c1c;
+      }
+    }
+  }
+  .profile-msg {
+    color: #e53935;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+}

@@ -16,7 +16,7 @@ import AircraftPage from "./pages/admin/aircraftPage/aircraftPage";
 import FlightPage from "./pages/admin/flightPage/flightPage";
 import BookingStatsPage from "./pages/admin/bookingStatsPage/bookingStatsPage";
 import DelayFlightPage from "./pages/admin/delayFlightPage/delayFlightPage";
-
+import ProfilePage from "./pages/users/ProfilePage/profilePage";
 
 const renderUserRouter = () => {
   const userRouters = [
@@ -47,6 +47,10 @@ const renderUserRouter = () => {
     {
       path: ROUTERS.USER.NEWS,
       component: <NewsPage />
+    },
+    {
+      path: ROUTERS.USER.PROFILE,
+      component: <ProfilePage />
     }
   ];
   return (
@@ -109,6 +113,16 @@ const renderAdminRouter = () => {
 const RouterCustom = () => {
   const location = useLocation();
   const isAdminRouters = location.pathname.startsWith(ADMIN_PATH);
+
+  // Nếu đúng route /ho-so thì render ProfilePage không bọc masterlayout
+  if (location.pathname === ROUTERS.USER.PROFILE) {
+    return (
+      <Routes>
+        <Route path={ROUTERS.USER.PROFILE} element={<ProfilePage />} />
+      </Routes>
+    );
+  }
+
   return isAdminRouters ? renderAdminRouter() : renderUserRouter();
 };
 

@@ -128,7 +128,22 @@ const Header = () => {
           ))}
           <li>
             {username ? (
-              <span className="login-button">{username}</span>
+              <span className="login-avatar" title={username}>
+                <img
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=0071c2&color=fff&size=32`}
+                  alt="avatar"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "2px solid #fff",
+                    background: "#0071c2",
+                    verticalAlign: "middle"
+                  }}
+                  onClick={() => navigate("/ho-so")}
+                />
+              </span>
             ) : (
               <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
                 Đăng nhập
