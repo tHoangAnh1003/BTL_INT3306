@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./profilePage.scss";
 import { useNavigate } from "react-router-dom";
+import { ROUTERS } from "../../../utils/router-config";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("info");
@@ -16,7 +17,7 @@ const ProfilePage = () => {
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) {
-          navigate("/admin/dang-nhap");
+          // navigate(ROUTERS.ADMIN.LOGIN);
           return;
         }
         // Lấy thông tin user
@@ -64,9 +65,27 @@ const ProfilePage = () => {
     }
   };
 
+  // Đăng xuất
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("username");
+    localStorage.removeItem("user");
+    window.dispatchEvent(new Event("storage")); // Để header cập nhật lại avatar
+    navigate("/");
+  };
+
   return (
     <div className="profile-page">
       <h2>Trang cá nhân</h2>
+      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+        <button onClick={() => navigate("/")} className="profile-btn">
+          Quay về trang chủ
+        </button>
+        <button onClick={handleLogout} className="profile-btn logout-btn">
+          Đăng xuất
+        </button>
+      </div>
       <div className="profile-tabs">
         <button
           className={activeTab === "info" ? "active" : ""}

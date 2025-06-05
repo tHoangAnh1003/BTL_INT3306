@@ -6,7 +6,6 @@ import MasterAdLayout from "./pages/theme/masterAdLayout/masterAdLayout";
 import LoginPage from "./pages/admin/loginPage/loginPage";
 import SignupPage from "./pages/admin/signupPage/signupPage";
 import BookingPage from "./pages/users/Booking/booking";
-import ManageBookingPage from "./pages/users/ManageBookingPage/manageBooking";
 import FlightInfoPage from "./pages/users/FlighInfomation/flightInfo";
 import PostPage from "./pages/admin/postPage/postPage";
 import FlightResultPage from "./pages/users/FlightResult/flightResult";
@@ -27,10 +26,6 @@ const renderUserRouter = () => {
     {
       path: ROUTERS.USER.BOOKING,
       component: <BookingPage />
-    },
-    {
-      path: ROUTERS.USER.MANAGE,
-      component: <ManageBookingPage />
     },
     {
       path: ROUTERS.USER.FLIGHT_INFO,

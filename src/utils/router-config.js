@@ -6,7 +6,6 @@ export const ROUTERS = {
   USER: {
     HOME: "",
     BOOKING: "dat-ve",
-    MANAGE: "quan-ly-dat-ve",
     CHECK_IN: "lam-thu-tuc",
     COMPLAINT: "khieu-nai",
     FLIGHT_INFO: "thong-tin-chuyen-bay",

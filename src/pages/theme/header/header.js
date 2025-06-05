@@ -22,7 +22,7 @@ const Header = () => {
   const [menus] = useState([
     { name: "Trang chủ", path: ROUTERS.USER.HOME },
     { name: "Mua vé", path: ROUTERS.USER.BOOKING },
-    { name: "Quản lý đặt chỗ", path: ROUTERS.USER.MANAGE },
+    { name: "Quản lý đặt chỗ", path: ROUTERS.USER.BOOKED_FLIGHTS },
     { name: "Thông tin chuyến bay", path: ROUTERS.USER.FLIGHT_INFO },
   ]);
 
@@ -78,12 +78,34 @@ const Header = () => {
                       e.preventDefault();
                       navigate("/");
                       setTimeout(() => window.location.reload(), 0);
+                      setIsMenuOpen(false);
                     }}
                   >
                     {menu.name}
                   </Link>
+                ) : (menu.name === "Quản lý đặt chỗ" || menu.name === "Thông tin chuyến bay") ? (
+                  <a
+                    href="#"
+                    className="qairline-nav-link"
+                    onClick={e => {
+                      e.preventDefault();
+                      const token = localStorage.getItem("accessToken");
+                      setIsMenuOpen(false);
+                      if (!token) {
+                        navigate(ROUTERS.ADMIN.LOGIN);
+                      } else {
+                        navigate(menu.path);
+                      }
+                    }}
+                  >
+                    {menu.name}
+                  </a>
                 ) : (
-                  <Link to={menu.path} className="qairline-nav-link">
+                  <Link
+                    to={menu.path}
+                    className="qairline-nav-link"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     {menu.name}
                   </Link>
                 )}
@@ -103,7 +125,7 @@ const Header = () => {
         <ul className="qairline-nav-menu">
           {menus.map((m, i) => (
             <li key={i}>
-              {m.name === "Thông tin chuyến bay" ? (
+              {(m.name === "Quản lý đặt chỗ" || m.name === "Thông tin chuyến bay") ? (
                 <a
                   href="#"
                   className="qairline-nav-link"
@@ -111,7 +133,7 @@ const Header = () => {
                     e.preventDefault();
                     const token = localStorage.getItem("accessToken");
                     if (!token) {
-                      navigate("/admin/dang-nhap");
+                      navigate(ROUTERS.ADMIN.LOGIN);
                     } else {
                       navigate(m.path);
                     }
