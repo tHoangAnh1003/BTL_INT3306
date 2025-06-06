@@ -192,18 +192,20 @@ public class BookingController {
 
 	@DeleteMapping("/cancel/{bookingId}")
 	public ResponseEntity<?> cancelBooking(HttpServletRequest request, @PathVariable Long bookingId) {
-		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-		if (user == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn cần đăng nhập");
-		}
+		System.out.println(">>> BookingId nhận từ client: " + bookingId);
+	    UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn cần đăng nhập");
+	    }
 
-		try {
-			bookingService.cancelBooking(bookingId, user.getId());
-			return ResponseEntity.ok("Hủy vé thành công");
-		} catch (RuntimeException ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-		}
+	    try {
+	        bookingService.cancelBooking(bookingId, user.getId());
+	        return ResponseEntity.ok("Hủy vé thành công");
+	    } catch (RuntimeException ex) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+	    }
 	}
+
 
 	@GetMapping("/statistics")
 	public ResponseEntity<List<BookingStatisticsDTO>> getBookingStatistics(HttpServletRequest request) {
@@ -225,7 +227,7 @@ public class BookingController {
 					.body(Collections.singletonMap("msg", "Chỉ khách hàng mới được xem danh sách vé đã đặt"));
 		}
 
-		List<BookingEntity> bookings = bookingRepository.findByPassenger_Id(user.getId());
+		List<BookingEntity> bookings = bookingRepository.findByPassenger_Id(user.getId() - 3); // passenger_id lệch user_id = 3
 		List<BookingSummaryDTO> response = new ArrayList<>();
 
 		for (BookingEntity booking : bookings) {

@@ -1,12 +1,14 @@
 package com.airline.DTO.booking;
 
 public class BookingSummaryDTO {
+	private Long id;
     private String flightNumber;
     private String bookingDate;
     private String route;           // "Hanoi - Ho Chi Minh City"
     private String departureTime;
     private String arrivalTime;
     private String seatNumber;
+    private String status;    
     
 	public String getFlightNumber() {
 		return flightNumber;
@@ -43,5 +45,17 @@ public class BookingSummaryDTO {
 	}
 	public void setSeatNumber(String seatNumber) {
 		this.seatNumber = seatNumber;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

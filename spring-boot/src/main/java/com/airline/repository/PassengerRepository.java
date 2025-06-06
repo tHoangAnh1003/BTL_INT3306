@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PassengerRepository extends JpaRepository<PassengerEntity, Long> {
 	Optional<PassengerEntity> findByUserId(Long id);
+	Optional<PassengerEntity> findByUser_Id(Long userId);
 }

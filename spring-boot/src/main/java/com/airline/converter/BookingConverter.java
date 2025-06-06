@@ -31,6 +31,7 @@ public class BookingConverter {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
 
         BookingSummaryDTO dto = new BookingSummaryDTO();
+        dto.setId(booking.getId());
         dto.setFlightNumber(flight.getFlightNumber());
         dto.setBookingDate(booking.getBookingDate().format(formatter));
 
@@ -39,6 +40,8 @@ public class BookingConverter {
         dto.setArrivalTime(flight.getArrivalTime().format(formatter));
 
         dto.setSeatNumber(seat.getSeatNumber());
+        
+        dto.setStatus(booking.getStatus());
 
         return dto;
     }

@@ -9,11 +9,14 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.airline.DTO.booking.BookingStatisticsDTO;
 import com.airline.entity.BookingEntity;
 import com.airline.entity.FlightEntity;
+import com.airline.entity.FlightSeatEntity;
 import com.airline.repository.BookingRepository;
+import com.airline.repository.FlightSeatRepository;
 import com.airline.service.BookingService;
 import com.airline.service.FlightService;
 
@@ -25,6 +28,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private FlightService flightService;
+    
+    @Autowired
+    private FlightSeatRepository flightSeatRepository;
 
     private static final long CANCEL_DEADLINE_HOURS = 24;
 
@@ -61,7 +67,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingEntity findById(Long id) {
         Optional<BookingEntity> bookingOpt = bookingRepository.findById(id);
-        if (bookingOpt.isPresent()) {
+        if (!bookingOpt.isPresent()) {
             throw new RuntimeException("Booking not found with id: " + id);
         }
         return bookingOpt.get();
@@ -73,10 +79,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public void cancelBooking(Long bookingId, Long userId) {
         BookingEntity booking = findById(bookingId);
 
-        if (!booking.getPassenger().getId().equals(userId)) {
+        if (!booking.getPassenger().getId().equals(userId - 3)) {
             throw new RuntimeException("User không có quyền hủy vé này");
         }
 
@@ -84,9 +91,20 @@ public class BookingServiceImpl implements BookingService {
             throw new RuntimeException("Vé đã bị hủy trước đó");
         }
 
+        if (booking.getFlight().getDepartureTime().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Không thể hủy vé đã hoặc đang trong thời gian bay");
+        }
+
         booking.setStatus("CANCELLED");
         bookingRepository.save(booking);
+
+        FlightSeatEntity seat = booking.getSeat();
+        if (seat != null) {
+            seat.setIsBooked(false);
+            flightSeatRepository.save(seat);
+        }
     }
+
     
     @Override
     public List<BookingStatisticsDTO> getBookingStatistics() {

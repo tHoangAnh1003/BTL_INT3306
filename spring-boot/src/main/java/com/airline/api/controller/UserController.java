@@ -1,5 +1,6 @@
 package com.airline.api.controller;
 
+import com.airline.DTO.passenger.MeResponseDTO;
 import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
 import com.airline.service.UserService;
@@ -102,5 +103,15 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Tạo nhân viên thành công");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @GetMapping("/me")
+    public MeResponseDTO getMyProfile(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            throw new RuntimeException("Unauthorized - userId not found in request");
+        }
+
+        return userService.getCurrentUserProfile(userId);
     }
 }

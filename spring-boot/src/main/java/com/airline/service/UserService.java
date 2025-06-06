@@ -2,6 +2,7 @@ package com.airline.service;
 
 import java.util.List;
 
+import com.airline.DTO.passenger.MeResponseDTO;
 import com.airline.entity.UserEntity;
 
 public interface UserService {
@@ -11,4 +12,5 @@ public interface UserService {
     void save(UserEntity user);
     List<UserEntity> findAll();
     UserEntity findById(Long id);
+    MeResponseDTO getCurrentUserProfile(Long userId);
 }
