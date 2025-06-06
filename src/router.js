@@ -31,10 +31,10 @@ const renderUserRouter = () => {
       path: ROUTERS.USER.FLIGHT_INFO,
       component: <FlightInfoPage />
     },
-    {
-      path: ROUTERS.USER.FLIGHT_RESULT,
-      component: <FlightResultPage />
-    },
+    // {
+    //   path: ROUTERS.USER.FLIGHT_RESULT,
+    //   component: <FlightResultPage />
+    // },
     {
       path: ROUTERS.USER.BOOKED_FLIGHTS,
       component: <BookedPage />

@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Booking/booking.scss";
+import FlightResultPage from "../FlightResult/flightResult";
 
 const tripTabs = [
   { id: "round", label: "Khứ hồi" },
@@ -22,6 +23,10 @@ const BookingPage = () => {
 
   const [airports, setAirports] = useState([]);
   const [loadingAirports, setLoadingAirports] = useState(true);
+
+  // State để điều khiển hiển thị FlightResultPage và truyền params
+  const [showFlightResult, setShowFlightResult] = useState(false);
+  const [flightResultState, setFlightResultState] = useState(null);
 
   useEffect(() => {
     // Lấy danh sách sân bay từ backend
@@ -79,9 +84,9 @@ const BookingPage = () => {
         };
       }
     }
-    navigate("/ket-qua-chuyen-bay", {
-      state: { ...form, params: new URLSearchParams(params).toString(), tripType }
-    });
+    
+    setFlightResultState({ ...form, params: new URLSearchParams(params).toString(), tripType });
+    setShowFlightResult(true);
   };
 
   return (
@@ -147,6 +152,13 @@ const BookingPage = () => {
           {loadingAirports ? "Đang tải..." : "Tìm chuyến bay"}
         </button>
       </form>
+
+      {/* Hiển thị kết quả tìm kiếm chuyến bay bên dưới form */}
+      {showFlightResult && (
+        <div style={{ marginTop: 32 }}>
+          <FlightResultPage location={{ state: flightResultState }} />
+        </div>
+      )}
     </div>
   );
 };

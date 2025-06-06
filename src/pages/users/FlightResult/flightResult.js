@@ -48,7 +48,10 @@ const FlightResultPage = () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       setSuccessMsg("Vui lòng đăng nhập để đặt vé!");
-      setTimeout(() => navigate("/login"), 1500);
+      setTimeout(() => {
+        setSuccessMsg("");
+        navigate("/login");
+      }, 1500);
       return;
     }
     // Lấy số hiệu chuyến bay (aircraftModel)
@@ -75,11 +78,14 @@ const FlightResultPage = () => {
       if (!res.ok) {
         const data = await res.json();
         setSuccessMsg(data.message || "Đặt vé thất bại!");
+        setTimeout(() => setSuccessMsg(""), 3000);
         return;
       }
       setSuccessMsg("Đặt vé thành công");
+      setTimeout(() => setSuccessMsg(""), 3000);
     } catch {
       setSuccessMsg("Lỗi kết nối máy chủ");
+      setTimeout(() => setSuccessMsg(""), 3000);
     }
   };
 

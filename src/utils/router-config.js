@@ -1,5 +1,3 @@
-import AircraftPage from "../pages/admin/aircraftPage/aircraftPage";
-
 export const ADMIN_PATH = "/admin";
 
 export const ROUTERS = {
@@ -9,7 +7,7 @@ export const ROUTERS = {
     CHECK_IN: "lam-thu-tuc",
     COMPLAINT: "khieu-nai",
     FLIGHT_INFO: "thong-tin-chuyen-bay",
-    FLIGHT_RESULT: "ket-qua-chuyen-bay",
+    // FLIGHT_RESULT: "ket-qua-chuyen-bay",
     BOOKED_FLIGHTS: "chuyen-bay-da-dat",
     NEWS: "tin-tuc",
     PROFILE: "/ho-so",
