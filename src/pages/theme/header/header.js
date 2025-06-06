@@ -322,9 +322,8 @@ const Header = () => {
       <div className="qairline-hero-content">
         <h1>Q Airline</h1>
         <p>
-          Hổ sa cơ cũng không đến lượt chó mèo lên tiếng.
-          <br />
-          Rồng mắc cạn cũng không ngang hàng với tép tôm.
+          Chào mừng bạn đến với Q Airline - đồng hành cùng bạn trên mọi hành trình bay an toàn và tiện nghi.<br />
+          Khám phá những trải nghiệm tuyệt vời và ưu đãi hấp dẫn chỉ có tại Q Airline!
         </p>
         <button
           className="hero-cta-button"
