@@ -235,82 +235,83 @@ const Header = () => {
               )}
             </li>
           ))}
-          <li style={{ position: "relative" }} ref={avatarRef}>
+
+          {/* Đoạn cần sửa */}
+          <li>
             {username ? (
-              <>
-                <span
-                  className="login-avatar"
-                  title={username}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setShowMenu((v) => !v)}
-                >
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=0071c2&color=fff&size=32`}
-                    alt="avatar"
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      border: "2px solid #fff",
-                      background: "#0071c2",
-                      verticalAlign: "middle"
-                    }}
-                  />
-                </span>
-                {showMenu && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 40,
-                      right: 0,
-                      background: "#fff",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                      borderRadius: 8,
-                      minWidth: 140,
-                      zIndex: 10,
-                      padding: "8px 0"
-                    }}
-                  >
-                    <button
-                      style={{
-                        width: "100%",
-                        background: "none",
-                        border: "none",
-                        padding: "8px 16px",
-                        textAlign: "left",
-                        cursor: "pointer",
-                        fontSize: 15
-                      }}
-                      onClick={() => {
-                        setShowMenu(false);
-                        navigate("/ho-so");
-                      }}
-                    >
-                      Xem hồ sơ
-                    </button>
-                    <button
-                      style={{
-                        width: "100%",
-                        background: "none",
-                        border: "none",
-                        padding: "8px 16px",
-                        textAlign: "left",
-                        cursor: "pointer",
-                        fontSize: 15,
-                        color: "#d32f2f"
-                      }}
-                      onClick={handleLogout}
-                    >
-                      Đăng xuất
-                    </button>
-                  </div>
-                )}
-              </>
+              // Nếu đã đăng nhập với role customer, hiển thị avatar/tên user
+              <span
+                className="login-button"
+                ref={avatarRef}
+                style={{ cursor: "pointer" }}
+                onClick={() => setShowMenu(!showMenu)}
+              >
+                {username.charAt(0).toUpperCase()}
+              </span>
             ) : (
+              // Nếu chưa đăng nhập, hiển thị nút đăng nhập
               <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
                 Đăng nhập
               </Link>
+            )}
+            {/* Dropdown menu khi bấm vào avatar */}
+            {showMenu && username && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: 48,
+                  background: "#fff",
+                  color: "#222",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                  borderRadius: 8,
+                  minWidth: 140,
+                  zIndex: 10,
+                  padding: "8px 0"
+                }}
+              >
+                <button
+                  style={{
+                    width: "100%",
+                    background: "none",
+                    border: "none",
+                    padding: "8px 16px",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    fontSize: 15
+                  }}
+                  onClick={() => {
+                    setShowMenu(false);
+                    navigate("/ho-so");
+                  }}
+                >
+                  Xem hồ sơ
+                </button>
+                <button
+                  style={{
+                    width: "100%",
+                    background: "none",
+                    border: "none",
+                    padding: "8px 16px",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    fontSize: 15,
+                    color: "#d32f2f"
+                  }}
+                  onClick={() => {
+                    localStorage.removeItem("accessToken");
+                    localStorage.removeItem("refreshToken");
+                    localStorage.removeItem("username");
+                    localStorage.removeItem("user");
+                    setUsername("");
+                    setShowMenu(false);
+                    window.dispatchEvent(new Event("storage"));
+                    navigate("/");
+                  }}
+                >
+                  Đăng xuất
+                </button>
+              </div>
             )}
           </li>
         </ul>
