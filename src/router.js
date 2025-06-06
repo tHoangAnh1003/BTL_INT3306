@@ -8,7 +8,6 @@ import SignupPage from "./pages/admin/signupPage/signupPage";
 import BookingPage from "./pages/users/Booking/booking";
 import FlightInfoPage from "./pages/users/FlighInfomation/flightInfo";
 import PostPage from "./pages/admin/postPage/postPage";
-import FlightResultPage from "./pages/users/FlightResult/flightResult";
 import BookedPage from "./pages/users/BookedPage/bookedPage";
 import NewsPage from "./pages/users/NewsPage/newsPage";
 import AircraftPage from "./pages/admin/aircraftPage/aircraftPage";

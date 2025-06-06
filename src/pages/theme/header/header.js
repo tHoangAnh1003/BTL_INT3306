@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import airlineBackgound from "../../../assets/imgs/background.jpg";
@@ -10,14 +10,56 @@ import { ROUTERS } from "../../../utils/router-config";
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [username, setUsername] = useState(localStorage.getItem("username") || "");
+  const [username, setUsername] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
+  const avatarRef = useRef(null);
 
+  // Lấy thông tin user từ backend nếu đã đăng nhập (có accessToken)
   useEffect(() => {
-    // Lắng nghe sự thay đổi của localStorage (nếu có logout ở nơi khác)
-    const handleStorage = () => setUsername(localStorage.getItem("username") || "");
+    const fetchUser = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setUsername("");
+        return;
+      }
+      try {
+        const res = await fetch("http://localhost:8081/api/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          // Chỉ hiện avatar nếu là khách hàng
+          if (data.role && (data.role === "CUSTOMER" || data.role.toLowerCase() === "customer")) {
+            setUsername(data.username || data.fullName || data.fullname || "");
+          } else {
+            setUsername("");
+          }
+        } else {
+          setUsername("");
+        }
+      } catch {
+        setUsername("");
+      }
+    };
+    fetchUser();
+    // Lắng nghe sự thay đổi của localStorage (logout ở nơi khác)
+    const handleStorage = () => fetchUser();
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
+  // Đóng menu khi click ra ngoài avatar
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (avatarRef.current && !avatarRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      window.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => window.removeEventListener("mousedown", handleClickOutside);
+  }, [showMenu]);
 
   const [menus] = useState([
     { name: "Trang chủ", path: ROUTERS.USER.HOME },
@@ -30,12 +72,17 @@ const Header = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData && userData.username) {
-      localStorage.setItem("username", userData.username);
-    }
-  }, []);
+  // Đăng xuất
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("username");
+    localStorage.removeItem("user");
+    setUsername("");
+    setShowMenu(false);
+    window.dispatchEvent(new Event("storage"));
+    navigate("/");
+  };
 
   return (
     <header
@@ -111,6 +158,46 @@ const Header = () => {
                 )}
               </li>
             ))}
+            {/* Thêm "Xem hồ sơ" ngay sau "Trang chủ" nếu đã đăng nhập */}
+            {username && (
+              <li>
+                <a
+                  href="#"
+                  className="qairline-nav-link"
+                  onClick={e => {
+                    e.preventDefault();
+                    setIsMenuOpen(false);
+                    navigate("/ho-so");
+                  }}
+                >
+                  Xem hồ sơ
+                </a>
+              </li>
+            )}
+            {/* Thêm "Đăng xuất" ở cuối menu nếu đã đăng nhập */}
+            {username && (
+              <li>
+                <button
+                  className="qairline-nav-link"
+                  style={{
+                    width: "100%",
+                    background: "none",
+                    border: "none",
+                    padding: "8px 16px",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    fontSize: 15,
+                    color: "#d32f2f"
+                  }}
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Đăng xuất
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       </div>
@@ -148,24 +235,78 @@ const Header = () => {
               )}
             </li>
           ))}
-          <li>
+          <li style={{ position: "relative" }} ref={avatarRef}>
             {username ? (
-              <span className="login-avatar" title={username}>
-                <img
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=0071c2&color=fff&size=32`}
-                  alt="avatar"
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    border: "2px solid #fff",
-                    background: "#0071c2",
-                    verticalAlign: "middle"
-                  }}
-                  onClick={() => navigate("/ho-so")}
-                />
-              </span>
+              <>
+                <span
+                  className="login-avatar"
+                  title={username}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowMenu((v) => !v)}
+                >
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=0071c2&color=fff&size=32`}
+                    alt="avatar"
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "2px solid #fff",
+                      background: "#0071c2",
+                      verticalAlign: "middle"
+                    }}
+                  />
+                </span>
+                {showMenu && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 40,
+                      right: 0,
+                      background: "#fff",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                      borderRadius: 8,
+                      minWidth: 140,
+                      zIndex: 10,
+                      padding: "8px 0"
+                    }}
+                  >
+                    <button
+                      style={{
+                        width: "100%",
+                        background: "none",
+                        border: "none",
+                        padding: "8px 16px",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        fontSize: 15
+                      }}
+                      onClick={() => {
+                        setShowMenu(false);
+                        navigate("/ho-so");
+                      }}
+                    >
+                      Xem hồ sơ
+                    </button>
+                    <button
+                      style={{
+                        width: "100%",
+                        background: "none",
+                        border: "none",
+                        padding: "8px 16px",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        fontSize: 15,
+                        color: "#d32f2f"
+                      }}
+                      onClick={handleLogout}
+                    >
+                      Đăng xuất
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
                 Đăng nhập
