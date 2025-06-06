@@ -26,6 +26,10 @@ public class PassengerEntity implements Serializable {
 
     @Column(name = "passport_number", unique = true, length = 50)
     private String passportNumber;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     public PassengerEntity() {
     }
@@ -45,7 +49,7 @@ public class PassengerEntity implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
+    }	
 
     public String getFullName() {
         return fullName;
@@ -102,4 +106,12 @@ public class PassengerEntity implements Serializable {
                 ", passportNumber='" + passportNumber + '\'' +
                 '}';
     }
+
+	public UserEntity getUser() {
+		return user;
+	}
+
+	public void setUser(UserEntity user) {
+		this.user = user;
+	}
 }

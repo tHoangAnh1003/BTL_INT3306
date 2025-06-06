@@ -21,5 +21,7 @@ public interface AirportRepository extends JpaRepository<AirportEntity, Long> {
     @Query("SELECT DISTINCT a.city FROM AirportEntity a")
     List<String> findDistinctCities();
     
+    Optional<AirportEntity> findByCityIgnoreCase(String city);
+    
     Optional<AirportEntity> findByName(String name);
 }

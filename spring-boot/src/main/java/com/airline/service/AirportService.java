@@ -7,4 +7,6 @@ public interface AirportService {
     List<AirportEntity> getAllAirports();
     
     List<String> getAllCities();
+    
+    String getAirportCodeByCity(String city);
 }

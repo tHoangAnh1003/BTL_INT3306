@@ -1,4 +1,4 @@
- package com.airline.api.controller;
+package com.airline.api.controller;
 
 import com.airline.entity.UserEntity;
 import com.airline.repository.BookingRepository;
@@ -21,15 +21,20 @@ import com.airline.utils.AuthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,169 +43,196 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/bookings")
 public class BookingController {
 
-    @Autowired
-    private BookingService bookingService;
-    
-    @Autowired 
-    private FlightRepository flightRepository;
+	@Autowired
+	private BookingService bookingService;
 
-    @Autowired
-    private PassengerRepository passengerRepository;
-    
-    @Autowired
-    private FlightSeatRepository flightSeatRepository;
-    
-    @Autowired
-    private BookingRepository bookingRepository;
-    
-    @GetMapping
-    public ResponseEntity<List<BookingResponseDTO>> getAll(HttpServletRequest request) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        List<BookingEntity> bookings = AuthUtil.isAdmin(user)
-                ? bookingService.getAllBookings()
-                : bookingService.getBookingsByPassengerId(user.getId());
+	@Autowired
+	private FlightRepository flightRepository;
 
-        List<BookingResponseDTO> dtoList = bookings.stream()
-        	    .map(BookingConverter::toDTO)
-        	    .collect(Collectors.toList());
-        return ResponseEntity.ok(dtoList);
-    }
+	@Autowired
+	private PassengerRepository passengerRepository;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BookingResponseDTO> getById(@PathVariable Long id) {
-        BookingEntity booking = bookingService.getBookingById(id);
-        return ResponseEntity.ok(BookingConverter.toDTO(booking));
-    }
-    
-    @PostMapping
-    public ResponseEntity<Map<String, Object>> createBooking(HttpServletRequest request,
-                                                             @RequestBody BookingRequestDTO bookingRequest) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+	@Autowired
+	private FlightSeatRepository flightSeatRepository;
 
-        if (!AuthUtil.isCustomer(user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Collections.singletonMap("msg", "Chỉ khách hàng mới được đặt vé"));
-        }
+	@Autowired
+	private BookingRepository bookingRepository;
 
-        List<FlightEntity> flights = flightRepository.findByAircraftModel(bookingRequest.getAircraftModel());
-        if (flights.isEmpty()) {
-            throw new RuntimeException("Không tìm thấy chuyến bay với máy bay: " + bookingRequest.getAircraftModel());
-        }
+	@GetMapping
+	public ResponseEntity<List<BookingResponseDTO>> getAll(HttpServletRequest request) {
+		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+		List<BookingEntity> bookings = AuthUtil.isAdmin(user) ? bookingService.getAllBookings()
+				: bookingService.getBookingsByPassengerId(user.getId());
 
-        FlightEntity flight = flights.get(0);
+		List<BookingResponseDTO> dtoList = bookings.stream().map(BookingConverter::toDTO).collect(Collectors.toList());
+		return ResponseEntity.ok(dtoList);
+	}
 
-        FlightSeatEntity seat = flightSeatRepository.findById(bookingRequest.getSeatId())
-                .orElseThrow(() -> new RuntimeException("Seat không tồn tại"));
+	@GetMapping("/{id}")
+	public ResponseEntity<BookingResponseDTO> getById(@PathVariable Long id) {
+		BookingEntity booking = bookingService.getBookingById(id);
+		return ResponseEntity.ok(BookingConverter.toDTO(booking));
+	}
 
-        PassengerEntity passenger = passengerRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("Passenger không tồn tại"));
+	@PostMapping
+	public ResponseEntity<?> createBooking(@RequestBody BookingRequestDTO request, HttpServletRequest httpRequest) {
+	    try {
+	        UserEntity user = (UserEntity) httpRequest.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+	        if (user == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+	        }
 
-        BookingEntity booking = new BookingEntity();
-        booking.setPassenger(passenger);
-        booking.setFlight(flight);
-        booking.setSeat(seat);
-        booking.setStatus(bookingRequest.getStatus());
-        booking.setBookingDate(LocalDateTime.now());
+	        Long userId = user.getId();
 
-        bookingService.createBooking(booking);
+	        if (request.getDepartureAirportCode() == null || request.getArrivalAirportCode() == null || request.getDepartureDate() == null) {
+	            return ResponseEntity.badRequest().body("Missing departure/arrival airport code or departure date");
+	        }
 
-        Map<String, Object> resp = new HashMap<>();
-        resp.put("msg", "Đặt vé thành công");
-        resp.put("bookingId", booking.getId());
+	        LocalDate departureDate;
+	        try {
+	            departureDate = LocalDate.parse(request.getDepartureDate());
+	        } catch (Exception e) {
+	            return ResponseEntity.badRequest().body("Invalid date format: " + request.getDepartureDate());
+	        }
 
-        return ResponseEntity.ok(resp);
-    }
+	        LocalDateTime startOfDay = departureDate.atStartOfDay();
+	        LocalDateTime endOfDay = departureDate.atTime(LocalTime.MAX);
+
+	        List<FlightEntity> matchedFlights = flightRepository.findByRouteAndDateRange(
+	                request.getDepartureAirportCode(),
+	                request.getArrivalAirportCode(),
+	                startOfDay,
+	                endOfDay
+	        );
+
+	        if (matchedFlights.isEmpty()) {
+	            return ResponseEntity.badRequest().body("No flights found matching the criteria.");
+	        }
+
+	        FlightEntity selectedFlight = matchedFlights.get(0);
+
+	        // Tìm ghế trống
+	        List<FlightSeatEntity> availableSeats = flightSeatRepository.findByFlightAndIsBookedFalse(selectedFlight);
+	        if (availableSeats.isEmpty()) {
+	            return ResponseEntity.badRequest().body("No available seats for this flight.");
+	        }
+	        
+	        FlightSeatEntity selectedSeat = availableSeats.get(new Random().nextInt(availableSeats.size()));
+
+	        Optional<PassengerEntity> optionalPassenger = passengerRepository.findByUserId(userId);
+	        if (!optionalPassenger.isPresent()) {
+	            return ResponseEntity.badRequest().body("Passenger not found for user id: " + userId);
+	        }
+	        
+	        BookingEntity booking = new BookingEntity();
+	        booking.setPassenger(optionalPassenger.get());
+	        booking.setFlight(selectedFlight);
+	        booking.setSeat(selectedSeat);
+	        booking.setBookingDate(LocalDateTime.now());
+	        booking.setStatus(request.getStatus() != null ? request.getStatus() : "CONFIRMED");
+
+	        bookingRepository.save(booking);
+
+	        selectedSeat.setIsBooked(true);
+	        flightSeatRepository.save(selectedSeat);
+
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("message", "Booking created successfully");
+	        response.put("bookingId", booking.getId());
+	        response.put("flightNumber", selectedFlight.getFlightNumber());
+	        response.put("seatNumber", selectedSeat.getSeatNumber());
+	        response.put("departureTime", selectedFlight.getDepartureTime());
+
+	        return ResponseEntity.ok(response);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.internalServerError().body("Error while creating booking: " + e.getMessage());
+	    }
+	}
 
 
+	@PutMapping("/{id}")
+	public ResponseEntity<BookingEntity> updateBooking(HttpServletRequest request, @PathVariable Long id,
+			@RequestBody BookingEntity booking) {
+		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+		BookingEntity existing = bookingService.getBookingById(id);
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BookingEntity> updateBooking(HttpServletRequest request,
-                                                       @PathVariable Long id,
-                                                       @RequestBody BookingEntity booking) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        BookingEntity existing = bookingService.getBookingById(id);
+		if (!AuthUtil.isAdmin(user) && !existing.getPassengerId().equals(user.getId())) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa đặt vé này.");
+		}
 
-        if (!AuthUtil.isAdmin(user) && !existing.getPassengerId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa đặt vé này.");
-        }
+		booking.setId(id);
+		bookingService.updateBooking(booking);
+		return ResponseEntity.ok(booking);
+	}
 
-        booking.setId(id);
-        bookingService.updateBooking(booking);
-        return ResponseEntity.ok(booking);
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteBooking(HttpServletRequest request, @PathVariable Long id) {
+		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+		BookingEntity existing = bookingService.getBookingById(id);
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBooking(HttpServletRequest request,
-                                           @PathVariable Long id) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        BookingEntity existing = bookingService.getBookingById(id);
+		if (!AuthUtil.isAdmin(user) && !existing.getId().equals(user.getId())) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền hủy đặt vé này.");
+		}
 
-        if (!AuthUtil.isAdmin(user) && !existing.getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền hủy đặt vé này.");
-        }
+		bookingService.deleteBooking(id);
+		return ResponseEntity.ok(Collections.singletonMap("msg", "Đã xóa thành công"));
+	}
 
-        bookingService.deleteBooking(id);
-        return ResponseEntity.ok(Collections.singletonMap("msg", "Đã xóa thành công"));
-    }
+	@GetMapping("/passenger/{passengerId}")
+	public ResponseEntity<List<BookingEntity>> getByPassenger(HttpServletRequest request,
+			@PathVariable Long passengerId) {
+		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+		if (AuthUtil.isAdmin(user) || user.getId().equals(passengerId)) {
+			return ResponseEntity.ok(bookingService.getBookingsByPassengerId(passengerId));
+		}
+		throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+	}
 
-    @GetMapping("/passenger/{passengerId}")
-    public ResponseEntity<List<BookingEntity>> getByPassenger(HttpServletRequest request,
-                                                              @PathVariable Long passengerId) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (AuthUtil.isAdmin(user) || user.getId().equals(passengerId)) {
-            return ResponseEntity.ok(bookingService.getBookingsByPassengerId(passengerId));
-        }
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
-    }
+	@DeleteMapping("/cancel/{bookingId}")
+	public ResponseEntity<?> cancelBooking(HttpServletRequest request, @PathVariable Long bookingId) {
+		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn cần đăng nhập");
+		}
 
-    @DeleteMapping("/cancel/{bookingId}")
-    public ResponseEntity<?> cancelBooking(HttpServletRequest request,
-                                           @PathVariable Long bookingId) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn cần đăng nhập");
-        }
+		try {
+			bookingService.cancelBooking(bookingId, user.getId());
+			return ResponseEntity.ok("Hủy vé thành công");
+		} catch (RuntimeException ex) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+		}
+	}
 
-        try {
-            bookingService.cancelBooking(bookingId, user.getId());
-            return ResponseEntity.ok("Hủy vé thành công");
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
-    }
+	@GetMapping("/statistics")
+	public ResponseEntity<List<BookingStatisticsDTO>> getBookingStatistics(HttpServletRequest request) {
+		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+		if (!AuthUtil.isAdmin(user)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+		}
 
-    
-    @GetMapping("/statistics")
-    public ResponseEntity<List<BookingStatisticsDTO>> getBookingStatistics(HttpServletRequest request) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
-        if (!AuthUtil.isAdmin(user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(null);
-        }
+		List<BookingStatisticsDTO> stats = bookingService.getBookingStatistics();
+		return ResponseEntity.ok(stats);
+	}
 
-        List<BookingStatisticsDTO> stats = bookingService.getBookingStatistics();
-        return ResponseEntity.ok(stats);
-    }
-    
-    @GetMapping("/my")
-    public ResponseEntity<?> getMyBookings(HttpServletRequest request) {
-        UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
+	@GetMapping("/my")
+	public ResponseEntity<?> getMyBookings(HttpServletRequest request) {
+		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
 
-        if (!AuthUtil.isCustomer(user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Collections.singletonMap("msg", "Chỉ khách hàng mới được xem danh sách vé đã đặt"));
-        }
+		if (!AuthUtil.isCustomer(user)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
+					.body(Collections.singletonMap("msg", "Chỉ khách hàng mới được xem danh sách vé đã đặt"));
+		}
 
-        List<BookingEntity> bookings = bookingRepository.findByPassenger_Id(user.getId());
-        List<BookingSummaryDTO> response = new ArrayList<>();
+		List<BookingEntity> bookings = bookingRepository.findByPassenger_Id(user.getId());
+		List<BookingSummaryDTO> response = new ArrayList<>();
 
-        for (BookingEntity booking : bookings) {
-            response.add(BookingConverter.toSummaryDTO(booking));
-        }
+		for (BookingEntity booking : bookings) {
+			response.add(BookingConverter.toSummaryDTO(booking));
+		}
 
-        return ResponseEntity.ok(response);
-    }
-
+		return ResponseEntity.ok(response);
+	}
 
 }
-

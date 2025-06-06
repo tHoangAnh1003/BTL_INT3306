@@ -18,5 +18,4 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
 			+ "JOIN airports arr ON f.arrival_airport = arr.airport_id "
 			+ "JOIN passengers p ON b.passenger_id = p.passenger_id", nativeQuery = true)
 	List<Object[]> getBookingStatisticsRaw();
-
 }

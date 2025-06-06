@@ -3,7 +3,6 @@ package com.airline.api.controller;
 import com.airline.entity.NewsEntity;
 import com.airline.entity.UserEntity;
 import com.airline.security.JwtAuthenticationFilter;
-import com.airline.security.JwtAuthenticationFilter_Test;
 import com.airline.service.NewsService;
 import com.airline.utils.AuthUtil;
 
