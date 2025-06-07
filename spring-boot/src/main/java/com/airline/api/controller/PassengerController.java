@@ -22,7 +22,7 @@ public class PassengerController {
     @Autowired
     private PassengerService passengerService;
 
-    // 1. Get passenger info 
+    // 1. Thông tin khách hàng 
     @GetMapping("/{passengerId}")
     public ResponseEntity<?> getPassengerById(HttpServletRequest request,
                                               @PathVariable Long passengerId) {
@@ -44,7 +44,7 @@ public class PassengerController {
         return ResponseEntity.ok(dto);
     }
 
-    // 2. Update passenger info 
+    // 2. Update thông tin khách hàng
     @PutMapping("/{passengerId}")
     public ResponseEntity<?> updatePassenger(HttpServletRequest request,
                                              @PathVariable Long passengerId,

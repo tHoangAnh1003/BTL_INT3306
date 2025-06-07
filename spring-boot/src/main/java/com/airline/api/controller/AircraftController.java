@@ -40,6 +40,7 @@ public class AircraftController {
 		}
     }
 
+    // Tạo ra tàu bay mới
     @PostMapping
     public ResponseEntity<?> createAircraft(@RequestBody CreateAircraftRequest request) {
         try {

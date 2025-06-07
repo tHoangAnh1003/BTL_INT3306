@@ -24,7 +24,7 @@ public class NewsController {
     @Autowired
     private NewsService newsService;
 
-    // 1. Get All News
+    // 1. Lấy ra thông tin
     @GetMapping
     public ResponseEntity<List<NewsEntity>> getAll() {
         List<NewsEntity> newsList = newsService.getAllNews();
@@ -43,7 +43,7 @@ public class NewsController {
         return ResponseEntity.ok(news);
     }
 
-    // 3. Create News (admin + staff)
+    // 3. Tạo tin tức mới (admin + staff)
     @PostMapping
     public ResponseEntity<?> create(HttpServletRequest request,
                                     @RequestBody NewsEntity news) {
@@ -66,7 +66,7 @@ public class NewsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
 
-    // 4. Update News (admin + staff)
+    // 4. Update Tin tức (admin + staff)
     @PutMapping("/{id}")
     public ResponseEntity<?> update(HttpServletRequest request,
                                     @PathVariable Long id,
@@ -87,7 +87,7 @@ public class NewsController {
         return ResponseEntity.ok(resp);
     }
 
-    // 5. Delete News (chỉ admin)
+    // 5. Xóa tin tức (chỉ admin)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(HttpServletRequest request,
                                     @PathVariable Long id) {

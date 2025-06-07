@@ -19,19 +19,21 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    // Đăng nhập
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         LoginResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
     }
 
+    // Refresh Token
     @PostMapping("/refresh")
     public ResponseEntity<RefreshTokenResponse> refreshAccessToken(@RequestBody RefreshTokenRequest request) {
         RefreshTokenResponse response = authService.refreshToken(request.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 
-    // Optional: Test endpoint (should move to a test controller or use PreAuthorize when ready)
+    // Test chức năng admin
     @GetMapping("/admin-only")
     public ResponseEntity<String> adminOnly(HttpServletRequest request) {
         String role = (String) request.getAttribute("role");

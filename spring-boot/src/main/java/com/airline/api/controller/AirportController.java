@@ -26,11 +26,13 @@ public class AirportController {
         return airportService.getAllAirports();
     }
     
+    // Lấy ra thành phố
     @GetMapping("/cities")
     public List<String> getAllCities() {
         return airportService.getAllCities();
     }
     
+    // Lấy mã thành phố
     @GetMapping("/code")
     public ResponseEntity<Map<String, String>> getCodeByCity(@RequestParam String city) {
         String code = airportService.getAirportCodeByCity(city);

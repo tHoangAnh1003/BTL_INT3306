@@ -58,22 +58,25 @@ public class BookingController {
 	@Autowired
 	private BookingRepository bookingRepository;
 
+	// Lấy ra Booking
 	@GetMapping
 	public ResponseEntity<List<BookingResponseDTO>> getAll(HttpServletRequest request) {
 		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
 		List<BookingEntity> bookings = AuthUtil.isAdmin(user) ? bookingService.getAllBookings()
-				: bookingService.getBookingsByPassengerId(user.getId());
+				: bookingService.getBookingsByPassengerId(user.getId() - 3);
 
 		List<BookingResponseDTO> dtoList = bookings.stream().map(BookingConverter::toDTO).collect(Collectors.toList());
 		return ResponseEntity.ok(dtoList);
 	}
 
+	// Lấy theo id
 	@GetMapping("/{id}")
 	public ResponseEntity<BookingResponseDTO> getById(@PathVariable Long id) {
 		BookingEntity booking = bookingService.getBookingById(id);
 		return ResponseEntity.ok(BookingConverter.toDTO(booking));
 	}
 
+	// Booking mới
 	@PostMapping
 	public ResponseEntity<?> createBooking(@RequestBody BookingRequestDTO request, HttpServletRequest httpRequest) {
 	    try {
@@ -167,6 +170,8 @@ public class BookingController {
 		return ResponseEntity.ok(booking);
 	}
 
+	
+	// Xóa đi booking
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteBooking(HttpServletRequest request, @PathVariable Long id) {
 		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
@@ -190,6 +195,7 @@ public class BookingController {
 		throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
 	}
 
+	// Hủy vé dành cho người dùng
 	@DeleteMapping("/cancel/{bookingId}")
 	public ResponseEntity<?> cancelBooking(HttpServletRequest request, @PathVariable Long bookingId) {
 		System.out.println(">>> BookingId nhận từ client: " + bookingId);
@@ -207,6 +213,7 @@ public class BookingController {
 	}
 
 
+	// Thống kê các vé (dành cho Admin)
 	@GetMapping("/statistics")
 	public ResponseEntity<List<BookingStatisticsDTO>> getBookingStatistics(HttpServletRequest request) {
 		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
@@ -218,6 +225,7 @@ public class BookingController {
 		return ResponseEntity.ok(stats);
 	}
 
+	// Xem vé của user (chỉ user mới xem được của mình)
 	@GetMapping("/my")
 	public ResponseEntity<?> getMyBookings(HttpServletRequest request) {
 		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);

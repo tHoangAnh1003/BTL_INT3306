@@ -105,6 +105,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
+    // Xem profile của mình
     @GetMapping("/me")
     public MeResponseDTO getMyProfile(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
