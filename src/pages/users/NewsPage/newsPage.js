@@ -4,6 +4,8 @@ import "./newsPage.scss";
 
 const NewsPage = () => {
   const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const location = useLocation();
 
   useEffect(() => {
@@ -16,51 +18,34 @@ const NewsPage = () => {
   }, [location.state]);
 
   useEffect(() => {
- 
-    // fetch("http://localhost:8081/api/news")
-    //   .then(res => res.json())
-    //   .then(data => setNews(data));
-    setNews([
-      {
-        id: 1,
-        title: "Giới thiệu về Q Airlines",
-        content: "Q Airlines là hãng hàng không hiện đại, an toàn và tiện nghi hàng đầu Việt Nam...",
-        date: "2025-06-01",
-        type: "Giới thiệu",
-      },
-      {
-        id: 2,
-        title: "Khuyến mại hè 2025",
-        content: "Giảm giá 30% cho tất cả các chuyến bay nội địa từ 01/06 đến 31/08/2025.",
-        date: "2025-05-25",
-        type: "Khuyến mại",
-      },
-      {
-        id: 3,
-        title: "Thông báo lịch bay mới",
-        content: "Q Airlines bổ sung thêm các chuyến bay Hà Nội - Phú Quốc từ tháng 7/2025.",
-        date: "2025-05-20",
-        type: "Thông báo",
-      },
-      {
-        id: 4,
-        title: "Tin tức: Q Airlines nhận giải thưởng dịch vụ xuất sắc",
-        content: "Q Airlines vừa được vinh danh tại lễ trao giải thưởng hàng không châu Á.",
-        date: "2025-05-15",
-        type: "Tin tức",
-      },
-    ]);
+    const fetchNews = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch("http://localhost:8081/api/news");
+        if (!res.ok) throw new Error("Không thể lấy dữ liệu tin tức");
+        const data = await res.json();
+        setNews(data);
+      } catch (err) {
+        setError(err.message || "Lỗi không xác định");
+        setNews([]);
+      }
+      setLoading(false);
+    };
+    fetchNews();
   }, []);
 
   return (
     <div className="news-page-wrapper" id="news-main-content">
       <h2>Giới thiệu & Tin tức Q Airlines</h2>
+      {loading && <div>Đang tải dữ liệu...</div>}
+      {error && <div style={{ color: "red" }}>{error}</div>}
       <div className="news-list">
         {news.map(item => (
-          <div className="news-item" key={item.id}>
-            <div className="news-type">{item.type}</div>
+          <div className="news-item" key={item.newsId || item.id}>
+            <div className="news-type">{item.type || item.newsType}</div>
             <h3>{item.title}</h3>
-            <div className="news-date">{item.date}</div>
+            <div className="news-date">{item.date || item.createdAt?.slice(0,10)}</div>
             <p>{item.content}</p>
           </div>
         ))}
