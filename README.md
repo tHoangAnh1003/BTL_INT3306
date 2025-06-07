@@ -37,6 +37,7 @@ QAirlines là hệ thống đặt vé máy bay và quản lý hãng hàng không
      mvn clean install
      mvn spring-boot:run
      ```
+     (Có thể chạy trên các IDE khác như Eclipse hay Intellij)
   3. API chạy tại: `http://localhost:8081/api/`
 
 ### 2. Frontend (ReactJS)
