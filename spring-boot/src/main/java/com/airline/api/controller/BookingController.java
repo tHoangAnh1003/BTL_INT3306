@@ -63,7 +63,7 @@ public class BookingController {
 	public ResponseEntity<List<BookingResponseDTO>> getAll(HttpServletRequest request) {
 		UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
 		List<BookingEntity> bookings = AuthUtil.isAdmin(user) ? bookingService.getAllBookings()
-				: bookingService.getBookingsByPassengerId(user.getId() - 3);
+				: bookingService.getBookingsByPassengerId(user.getId());
 
 		List<BookingResponseDTO> dtoList = bookings.stream().map(BookingConverter::toDTO).collect(Collectors.toList());
 		return ResponseEntity.ok(dtoList);
@@ -154,7 +154,7 @@ public class BookingController {
 	    }
 	}
 
-
+	// Update đặt vé
 	@PutMapping("/{id}")
 	public ResponseEntity<BookingEntity> updateBooking(HttpServletRequest request, @PathVariable Long id,
 			@RequestBody BookingEntity booking) {
@@ -198,7 +198,6 @@ public class BookingController {
 	// Hủy vé dành cho người dùng
 	@DeleteMapping("/cancel/{bookingId}")
 	public ResponseEntity<?> cancelBooking(HttpServletRequest request, @PathVariable Long bookingId) {
-		System.out.println(">>> BookingId nhận từ client: " + bookingId);
 	    UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
 	    if (user == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn cần đăng nhập");
