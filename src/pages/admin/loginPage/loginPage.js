@@ -21,18 +21,17 @@ const LoginPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+      console.log(form);
       if (!res.ok) {
         const data = await res.json();
         setError(data.message || "Đăng nhập thất bại");
         return;
       }
       const data = await res.json();
-      // Lưu token vào localStorage/sessionStorage
+      console.log("Booking statistics data:", data);
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-      // if (data.username) {
-      //   localStorage.setItem("username", data.username);
-      // }
+
       // Decode token và lấy role
       let role = "";
       try {
