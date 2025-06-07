@@ -10,7 +10,9 @@ import { ROUTERS } from "../../../utils/router-config";
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(
+   localStorage.getItem("username") || ""
+);
   const [showMenu, setShowMenu] = useState(false);
   const avatarRef = useRef(null);
 
@@ -19,7 +21,7 @@ const Header = () => {
     const fetchUser = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        setUsername("");
+        setUsername(localStorage.getItem("username") || "");
         localStorage.removeItem("username");
         return;
       }
@@ -31,7 +33,7 @@ const Header = () => {
         if (res.ok) {
           const data = await res.json();
           if (data.role && (data.role === "CUSTOMER" || data.role.toLowerCase() === "customer")) {
-            const name = data.username || data.fullName || data.fullname || "";
+            const name = data.username || data.fullName || localStorage.getItem("username") || data.fullname || "";
             setUsername(name);
             localStorage.setItem("username", name);
           } else {
@@ -51,7 +53,7 @@ const Header = () => {
     const handleStorage = () => {
       fetchUser();
     };
-    window.addEventListener("storage", handleStorage);
+    // window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 

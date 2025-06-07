@@ -21,37 +21,48 @@ const LoginPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      console.log(form);
+      
       if (!res.ok) {
         const data = await res.json();
         setError(data.message || "Đăng nhập thất bại");
         return;
       }
+      
       const data = await res.json();
-      console.log("Booking statistics data:", data);
+      
+      // Debug để kiểm tra response
+      console.log("Login response:", data);
+      
+      // Lưu thông tin vào localStorage
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-
-      // Decode token và lấy role
-      let role = "";
-      try {
-        const decoded = jwtDecode(data.accessToken);
-        console.log("Decoded accessToken:", decoded);
-        role = decoded.role;
-        // Lưu username/email nếu muốn
-        localStorage.setItem("username", decoded.email || decoded.sub || "");
-        window.dispatchEvent(new Event("storage"));
-      } catch (err) {
-        console.log("Không thể decode token", err);
+      
+      if (data.username) {
+        localStorage.setItem("username", data.username);
       }
-
-      // Điều hướng theo role
-      if (role && role.toLowerCase() === "admin") {
+      
+      // Lưu role để sử dụng sau này
+      if (data.role) {
+        localStorage.setItem("userRole", data.role);
+      }
+      
+      // Logic điều hướng đã sửa
+      const userRole = data.role?.toLowerCase();
+      
+      if (userRole === "admin" || userRole === "staff") {
+        // Admin và Staff đều vào trang admin
         navigate(ROUTERS.ADMIN.POST || "/admin/post");
-      } else {
+      } else if (userRole === "customer") {
+        // Customer về trang chủ dành cho user
         navigate("/");
+      } else {
+        // Trường hợp role không xác định
+        console.warn("Unknown role:", data.role);
+        setError("Vai trò người dùng không hợp lệ");
       }
+      
     } catch (err) {
+      console.error("Login error:", err);
       setError("Lỗi kết nối máy chủ");
     }
   };
