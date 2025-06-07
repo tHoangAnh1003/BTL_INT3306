@@ -30,10 +30,24 @@ const LoginPage = () => {
       // Lưu token vào localStorage/sessionStorage
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-      if (data.username) {
-        localStorage.setItem("username", data.username);
+      // if (data.username) {
+      //   localStorage.setItem("username", data.username);
+      // }
+      // Decode token và lấy role
+      let role = "";
+      try {
+        const decoded = jwtDecode(data.accessToken);
+        console.log("Decoded accessToken:", decoded);
+        role = decoded.role;
+        // Lưu username/email nếu muốn
+        localStorage.setItem("username", decoded.email || decoded.sub || "");
+        window.dispatchEvent(new Event("storage"));
+      } catch (err) {
+        console.log("Không thể decode token", err);
       }
-      if (data.role === "ADMIN") {
+
+      // Điều hướng theo role
+      if (role && role.toLowerCase() === "admin") {
         navigate(ROUTERS.ADMIN.POST || "/admin/post");
       } else {
         navigate("/");
