@@ -248,25 +248,21 @@ const Header = () => {
             </li>
           ))}
 
-          {/* Đoạn cần sửa */}
           <li>
             {username ? (
-              // Nếu đã đăng nhập với role customer, hiển thị avatar/tên user
               <span
                 className="login-button"
                 ref={avatarRef}
                 style={{ cursor: "pointer" }}
                 onClick={() => setShowMenu(!showMenu)}
               >
-                {username.charAt(0).toUpperCase()}
+                {username}
               </span>
             ) : (
-              // Nếu chưa đăng nhập, hiển thị nút đăng nhập
               <Link to={ROUTERS.ADMIN.LOGIN} className="login-button">
                 Đăng nhập
               </Link>
             )}
-            {/* Dropdown menu khi bấm vào avatar */}
             {showMenu && username && (
               <div
                 style={{
