@@ -20,6 +20,12 @@ const Header = () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
         setUsername("");
+        localStorage.removeItem("username");
+        return;
+      }
+      const localUsername = localStorage.getItem("username");
+      if (localUsername) {
+        setUsername(localUsername);
         return;
       }
       try {
@@ -28,22 +34,28 @@ const Header = () => {
         });
         if (res.ok) {
           const data = await res.json();
-          // Chỉ hiện avatar nếu là khách hàng
           if (data.role && (data.role === "CUSTOMER" || data.role.toLowerCase() === "customer")) {
-            setUsername(data.username || data.fullName || data.fullname || "");
+            const name = data.username || data.fullName || data.fullname || "";
+            setUsername(name);
+            localStorage.setItem("username", name);
           } else {
             setUsername("");
+            localStorage.removeItem("username");
           }
         } else {
           setUsername("");
+          localStorage.removeItem("username");
         }
       } catch {
         setUsername("");
+        localStorage.removeItem("username");
       }
     };
     fetchUser();
-    // Lắng nghe sự thay đổi của localStorage (logout ở nơi khác)
-    const handleStorage = () => fetchUser();
+    const handleStorage = () => {
+      setUsername(localStorage.getItem("username") || "");
+      fetchUser();
+    };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
@@ -299,14 +311,7 @@ const Header = () => {
                     color: "#d32f2f"
                   }}
                   onClick={() => {
-                    localStorage.removeItem("accessToken");
-                    localStorage.removeItem("refreshToken");
-                    localStorage.removeItem("username");
-                    localStorage.removeItem("user");
-                    setUsername("");
-                    setShowMenu(false);
-                    window.dispatchEvent(new Event("storage"));
-                    navigate("/");
+                    handleLogout();
                   }}
                 >
                   Đăng xuất

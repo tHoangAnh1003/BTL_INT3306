@@ -88,68 +88,20 @@ const ProfilePage = () => {
       </div>
       <div className="profile-tabs">
         <button
-          className={activeTab === "info" ? "active" : ""}
+          className="active"
           onClick={() => setActiveTab("info")}
         >
           Thông tin cá nhân
-        </button>
-        <button
-          className={activeTab === "bookings" ? "active" : ""}
-          onClick={() => setActiveTab("bookings")}
-        >
-          Chuyến bay đã đặt
         </button>
       </div>
       <div className="profile-tab-content">
         {loading ? (
           <div>Đang tải dữ liệu...</div>
-        ) : activeTab === "info" ? (
+        ) : (
           <div className="profile-info">
             <div><b>Họ tên:</b> {user.fullname || user.fullName || user.name}</div>
             <div><b>Email:</b> {user.email}</div>
             <div><b>Tên đăng nhập:</b> {user.username}</div>
-          </div>
-        ) : (
-          <div>
-            <h3>Chuyến bay đã đặt</h3>
-            {msg && <div className="profile-msg">{msg}</div>}
-            <table className="profile-booking-table">
-              <thead>
-                <tr>
-                  <th>Số hiệu chuyến bay</th>
-                  <th>Số ghế</th>
-                  <th>Thời gian đặt vé</th>
-                  <th>Trạng thái</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} style={{ textAlign: "center" }}>Bạn chưa đặt vé nào</td>
-                  </tr>
-                ) : (
-                  bookings.map((b, idx) => (
-                    <tr key={idx}>
-                      <td>{b.aircraftModel || b.flightNumber}</td>
-                      <td>{b.seatId || b.seatNumber}</td>
-                      <td>{b.time || b.bookingDate}</td>
-                      <td>{b.status || "Confirmed"}</td>
-                      <td>
-                        {b.status !== "Cancelled" && (
-                          <button
-                            className="cancel-btn"
-                            onClick={() => handleCancel(b.bookingId || b.id)}
-                          >
-                            Hủy vé
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
           </div>
         )}
       </div>
