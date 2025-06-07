@@ -23,11 +23,7 @@ const Header = () => {
         localStorage.removeItem("username");
         return;
       }
-      const localUsername = localStorage.getItem("username");
-      if (localUsername) {
-        setUsername(localUsername);
-        return;
-      }
+      // Luôn gọi API để lấy thông tin user mới nhất
       try {
         const res = await fetch("http://localhost:8081/api/users/me", {
           headers: { Authorization: `Bearer ${token}` },
@@ -53,7 +49,6 @@ const Header = () => {
     };
     fetchUser();
     const handleStorage = () => {
-      setUsername(localStorage.getItem("username") || "");
       fetchUser();
     };
     window.addEventListener("storage", handleStorage);
