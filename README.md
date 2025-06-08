@@ -85,7 +85,20 @@ QAirlines là hệ thống đặt vé máy bay và quản lý hãng hàng không
 
 ## 📷 Demo giao diện
 
-- Trang chủ, đặt vé, quản lý vé, tin tức, trang admin, đăng tin, quản lý chuyến bay, tàu bay, delay, v.v.
+### Trang chủ
+![Trang chủ](./assets/images/home.png)
+
+### Đăng nhập
+![Đăng nhập](./assets/images/login.png)
+
+### Đặt vé máy bay
+![Đặt vé](./assets/images/booking.png)
+
+### Quản lý vé đã đặt
+![Quản lý vé](./assets/images/tickets.png)
+
+### Giao diện quản trị viên
+![Admin Dashboard](./assets/images/admin-dashboard.png)
 
 ---
 
