@@ -1,0 +1,118 @@
+.booking-manage-wrapper {
+  padding: 2rem;
+  background: #fff;
+  min-height: 60vh;
+
+  h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #0071c2;
+    text-align: center;
+  }
+
+  .booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    background: #f9f9f9;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+
+    th {
+      background: #0071c2;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f5faff;
+    }
+
+    tr:hover {
+      background: #e6f7ff;
+    }
+
+    button {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+      &:hover {
+        background: #b71c1c;
+      }
+    }
+  }
+}
+
+#booked-page {
+  max-width: 900px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px 24px;
+
+  h2 {
+    text-align: center;
+    color: #0071c2;
+    margin-bottom: 24px;
+  }
+
+  .booked-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+
+    th {
+      background: #f2f8fc;
+      color: #0071c2;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+  }
+}
+
+.cancel-btn {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #b71c1c;
+  }
+}
+
+.booking-msg {
+  text-align: center;
+  margin: 16px 0;
+  font-size: 1.1rem;
+  color: #fff;
+  background: #4caf50;
+  border-radius: 6px;
+  padding: 10px 0;
+
+  &.error {
+    background: #e53935;
+  }
+}

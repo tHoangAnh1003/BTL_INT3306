@@ -10,7 +10,7 @@ import java.sql.SQLException;
 @Configuration
 public class DatabaseConfig {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/airline";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/qairline";
     private static final String USER = "root";
     private static final String PASS = "HoangAnh1003";
 

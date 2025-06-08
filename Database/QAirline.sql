@@ -1,3 +1,4 @@
+-- Database mới. Đã clean dữ liệu
 CREATE DATABASE AIRLINE;
 
 USE AIRLINE;
@@ -110,7 +111,7 @@ INSERT INTO airports (name, code, city, country) VALUES
 ('Da Nang International Airport', 'DAD', 'Da Nang', 'Vietnam'),
 ('Cam Ranh International Airport', 'CXR', 'Nha Trang', 'Vietnam'),
 ('Phu Quoc International Airport', 'PQC', 'Phu Quoc', 'Vietnam'),
-('Noibai Domestic Terminal', 'NBD', 'Hanoi', 'Vietnam'),
+('Vinh International Airport', 'VII', 'Vinh', 'Vietnam'),
 ('Suvarnabhumi Airport', 'BKK', 'Bangkok', 'Thailand'),
 ('Changi Airport', 'SIN', 'Singapore', 'Singapore'),
 ('Kuala Lumpur International Airport', 'KUL', 'Kuala Lumpur', 'Malaysia'),
@@ -357,4 +358,3 @@ INSERT INTO news (title, content, created_at, author) VALUES
 ('Khảo sát ý kiến khách hàng', 
 'Chúng tôi rất mong nhận được sự tham gia của quý khách trong khảo sát ý kiến để không ngừng cải thiện chất lượng dịch vụ và đáp ứng tốt hơn nhu cầu của hành khách.', 
 '2025-06-28 10:00:00', 'staff');
-

@@ -7,6 +7,7 @@ public class BookingStatisticsDTO {
     private String route; // HaNoi - Ho Chi Minh city, Hanoi - kuala lumpur
     private String departureTime;
     private String passengerName;
+    private String status;
 
     // Getters and setters
     public String getAircraftModel() {
@@ -40,4 +41,12 @@ public class BookingStatisticsDTO {
     public void setPassengerName(String passengerName) {
         this.passengerName = passengerName;
     }
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 }

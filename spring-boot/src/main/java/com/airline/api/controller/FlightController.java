@@ -83,9 +83,6 @@ public class FlightController {
         try {
             UserEntity user = (UserEntity) request.getAttribute(JwtAuthenticationFilter.USER_ATTR);
             
-            String userRole = (String) request.getAttribute("userRole");
-            System.out.println("User role in controller: " + userRole);
-            
             if (!AuthUtil.isAdmin(user) && !AuthUtil.isStaff(user)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(new ErrorResponse("Chỉ admin hoặc staff mới được thêm chuyến bay"));

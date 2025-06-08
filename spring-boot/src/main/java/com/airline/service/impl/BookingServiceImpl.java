@@ -129,6 +129,8 @@ public class BookingServiceImpl implements BookingService {
             }
 
             dto.setPassengerName((String) row[4]);
+            
+            dto.setStatus((String) row[5]);
 
             result.add(dto);
         }

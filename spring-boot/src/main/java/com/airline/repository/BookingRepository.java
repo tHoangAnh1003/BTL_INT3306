@@ -12,7 +12,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
 	List<BookingEntity> findByPassenger_Id(Long passengerId);
 
 	@Query(value = "SELECT b.booking_id, a.model AS aircraft_model, " + " CONCAT(dep.city, ' → ', arr.city) AS route, "
-			+ "f.departure_time, p.full_name AS passenger_name " + "FROM bookings b "
+			+ "f.departure_time, p.full_name AS passenger_name, b.status " + "FROM bookings b "
 			+ "JOIN flights f ON b.flight_id = f.flight_id " + "JOIN aircrafts a ON f.airline_id = a.airline_id "
 			+ "JOIN airports dep ON f.departure_airport = dep.airport_id "
 			+ "JOIN airports arr ON f.arrival_airport = arr.airport_id "
