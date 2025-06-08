@@ -1,0 +1,45 @@
+.booking-stats-page {
+  max-width: 900px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px 24px;
+
+  h2 {
+    text-align: center;
+    color: #0071c2;
+    margin-bottom: 24px;
+  }
+
+  .booking-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .booking-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+
+    th {
+      background: #f2f8fc;
+      color: #0071c2;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+  }
+
+  .error {
+    color: #e53935;
+    text-align: center;
+    margin: 16px 0;
+  }
+}

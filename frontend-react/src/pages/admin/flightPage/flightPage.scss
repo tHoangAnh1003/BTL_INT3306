@@ -1,0 +1,106 @@
+.flight-page {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 32px 28px;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+    color: #0071c2;
+    font-weight: 700;
+  }
+
+  .flight-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 500;
+      color: #222;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    input,
+    textarea {
+      margin-top: 6px;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border 0.2s;
+      background: #f8fafd;
+
+      &:focus {
+        border: 1.5px solid #0071c2;
+        outline: none;
+        background: #fff;
+      }
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    button[type="submit"] {
+      margin-top: 10px;
+      padding: 10px 0;
+      background: #0071c2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #005fa3;
+      }
+    }
+
+    .success {
+      color: #1a8917;
+      background: #eafbe7;
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 0.98rem;
+    }
+
+    .error {
+      color: #c0392b;
+      background: #fdecea;
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 0.98rem;
+    }
+
+    select[name="status"] {
+      padding: 8px 12px;
+      border: 1.5px solid #0071c2;
+      border-radius: 6px;
+      background: #f8fafd;
+      font-size: 1rem;
+      color: #003366;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      transition: border 0.2s;
+
+      &:focus {
+        border: 1.5px solid #005fa3;
+        background: #fff;
+        outline: none;
+      }
+    }
+  }
+}

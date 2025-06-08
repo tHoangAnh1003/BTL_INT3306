@@ -1,3 +1,5 @@
+-- Database gốc sử dụng trong kiểm thử và quay video
+
 create database qairline;
 
 use qairline;
@@ -17,7 +19,7 @@ CREATE TABLE airlines (
 ) ENGINE=InnoDB;
 
 CREATE TABLE passengers (
-    passenger_id INT AUTO_INCREMENT PRIMARY KEY,
+    passenger_id INT AUTO_INCREMENT PRIMARY KEY,	
     full_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(20) NOT NULL,
@@ -91,8 +93,29 @@ CREATE TABLE payments (
     CONSTRAINT fk_payment_booking FOREIGN KEY (booking_id) REFERENCES bookings(booking_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE news (
+  news_id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  created_at DATETIME NOT NULL,
+  author VARCHAR(100)
+);
+
 -- Kiểm tra các bảng
 SHOW TABLES;
+
+INSERT INTO news (title, content, created_at, author) VALUES
+('Khai trương tuyến bay mới Hà Nội - Osaka', 'Vietnam Airlines vừa chính thức khai trương đường bay mới từ Hà Nội đến Osaka nhằm đáp ứng nhu cầu du lịch và công tác.', '2025-05-20 08:30:00', 'Nguyễn Văn An'),
+('Hãng hàng không ABC ra mắt chương trình khuyến mãi hè', 'Hãng ABC tung chương trình khuyến mãi giảm giá đến 50% cho các tuyến bay nội địa trong mùa hè.', '2025-05-18 10:00:00', 'Trần Thị Bích'),
+('Cảnh báo thời tiết ảnh hưởng đến các chuyến bay', 'Do ảnh hưởng của áp thấp nhiệt đới, một số chuyến bay đi miền Trung có thể bị hoãn hoặc hủy.', '2025-05-21 14:45:00', 'Lê Minh Tuấn'),
+('Triển khai dịch vụ check-in online toàn hệ thống', 'Từ tháng 6/2025, tất cả hành khách có thể sử dụng dịch vụ check-in online của hãng trước 24 giờ bay.', '2025-05-22 09:00:00', 'Phạm Hoài Nam'),
+('Sân bay Tân Sơn Nhất nâng cấp nhà ga quốc nội', 'Sân bay Tân Sơn Nhất sẽ nâng cấp nhà ga quốc nội để tăng công suất phục vụ dịp lễ.', '2025-05-19 11:20:00', 'Nguyễn Thị Lan'),
+('Hãng XYZ đạt giải thưởng dịch vụ khách hàng tốt nhất', 'Hãng hàng không XYZ vừa vinh dự nhận giải thưởng do Hiệp hội Hàng không Châu Á bình chọn.', '2025-05-17 13:10:00', 'Đào Quang Huy'),
+('Miễn phí hoàn vé cho hành khách bị ảnh hưởng dịch bệnh', 'Hành khách bị ảnh hưởng do dịch bệnh sẽ được hoàn vé miễn phí khi cung cấp giấy tờ xác minh.', '2025-05-23 16:00:00', 'Bùi Thị Hạnh'),
+('Mở bán vé Tết 2026 từ ngày 1/6', 'Các hãng hàng không sẽ mở bán vé Tết Nguyên Đán 2026 từ ngày 1/6/2025 với nhiều khung giờ linh hoạt.', '2025-05-24 08:00:00', 'Vũ Văn Kiên'),
+('Đưa vào sử dụng máy bay Airbus A350 mới', 'Hãng VNA vừa đưa vào sử dụng máy bay Airbus A350 cho các tuyến bay quốc tế trọng điểm.', '2025-05-20 17:25:00', 'Ngô Thị Thảo'),
+('Hợp tác giữa hãng bay và ứng dụng đặt xe', 'Hãng ABC hợp tác cùng ứng dụng ABC Ride để cung cấp dịch vụ đưa đón sân bay cho hành khách.', '2025-05-25 15:40:00', 'Lý Minh Phong');
+
 
 INSERT INTO airports (name, code, city, country) VALUES
 ('Noi Bai International Airport', 'HAN', 'Hanoi', 'Vietnam'),
@@ -216,4 +239,40 @@ INSERT INTO bookings (passenger_id, flight_id, seat_id, status) VALUES
 (9, 5, 9, 'Confirmed'),
 (10, 5, 10, 'Cancelled');
 
+-- hash password
+UPDATE users
+SET password_hash = '$2a$10$MaonPOBcRp..PIQSQTsg6.EaZ20t8UoO4u2MyTbcdrV5gLuIqFWCi' -- hash 123456
+WHERE user_id BETWEEN 1 AND 10;
 
+-- thêm data cho round-trip
+INSERT INTO flights (airline_id, flight_number, departure_airport, arrival_airport, departure_time, arrival_time, status) VALUES
+(1, 'VN101', 1, 2, '2025-06-07 08:00:00', '2025-06-07 10:00:00', 'Scheduled'),
+(1, 'VN102', 2, 1, '2025-06-07 18:00:00', '2025-06-07 20:00:00', 'Scheduled'),
+
+(1, 'VN103', 1, 3, '2025-06-08 09:00:00', '2025-06-08 11:30:00', 'Scheduled'),
+(1, 'VN104', 3, 1, '2025-06-08 17:30:00', '2025-06-08 20:00:00', 'Scheduled'),
+
+(1, 'VN105', 1, 4, '2025-06-09 06:30:00', '2025-06-09 09:00:00', 'Scheduled'),
+(1, 'VN106', 4, 1, '2025-06-09 19:00:00', '2025-06-09 21:30:00', 'Scheduled'),
+
+(1, 'VN107', 1, 5, '2025-06-10 07:45:00', '2025-06-10 10:15:00', 'Scheduled'),
+(1, 'VN108', 5, 1, '2025-06-10 16:15:00', '2025-06-10 18:45:00', 'Scheduled'),
+
+(1, 'VN109', 1, 6, '2025-06-10 11:00:00', '2025-06-10 13:30:00', 'Scheduled'),
+(1, 'VN110', 6, 1, '2025-06-10 20:00:00', '2025-06-10 22:30:00', 'Scheduled');
+
+
+-- update khóa
+ALTER TABLE passengers ADD COLUMN user_id INT UNIQUE;
+ALTER TABLE passengers ADD CONSTRAINT fk_user
+    FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+-- update id (id passengers lệch userid 3)
+UPDATE passengers SET user_id = 4 WHERE passenger_id = 1;
+UPDATE passengers SET user_id = 5 WHERE passenger_id = 2;
+UPDATE passengers SET user_id = 6 WHERE passenger_id = 3;
+UPDATE passengers SET user_id = 7 WHERE passenger_id = 4;
+UPDATE passengers SET user_id = 8 WHERE passenger_id = 5;
+UPDATE passengers SET user_id = 9 WHERE passenger_id = 6;
+UPDATE passengers SET user_id = 10 WHERE passenger_id = 7;
+UPDATE passengers SET user_id = 11 WHERE passenger_id = 8;
